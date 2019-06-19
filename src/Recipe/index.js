@@ -1,9 +1,23 @@
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+
+import {
+  Container,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  InputAdornment,
+  IconButton
+} from "@material-ui/core";
+
+import DeleteIcon from "@material-ui/icons/Delete";
+import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+
 import formFields from "../utils/formFields";
 import { navigate } from "@reach/router";
-import Dates from "../Dates";
+import Dates from "../Dates/";
 
 const API_PATH = "http://localhost:8080/api";
 
@@ -67,9 +81,9 @@ class Recipe extends React.Component {
 
   handleInputChange = event => {
     if (event && event.preventDefault) event.preventDefault();
-    const { target } = event;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    const { name } = target;
+    const {
+      target: { name, value }
+    } = event;
     this.setState(({ values }) => {
       values[name] = value;
       return { values, hasChanged: true };
@@ -117,73 +131,143 @@ class Recipe extends React.Component {
       });
   };
 
+  onCheck = (event, checked) => {
+    const { name } = event.target;
+    this.setState(({ values }) => {
+      values[name] = checked;
+      return { values, hasChanged: true };
+    });
+  };
+
+  renderFields = () => {
+    const { formState, values } = this.state;
+    const fields = Object.entries(formState);
+
+    const renderField = ([key, { label, type, mandatory }]) => {
+      let field;
+      switch (type) {
+        case "checkbox":
+          field = (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={values[key] || formState[key].defaultValue}
+                  onChange={this.onCheck}
+                  name={key}
+                />
+              }
+              label={label}
+              labelPlacement="end"
+              key={key}
+            />
+          );
+          break;
+        case "date":
+          field = (
+            <Dates
+              key={key}
+              name={key}
+              label={label}
+              required={mandatory}
+              dates={values[key] || formState[key].defaultValue}
+              onChange={this.handleInputChange}
+              onSubmit={this.handleInputChange}
+            />
+          );
+          break;
+        case "url":
+          field = (
+            <TextField
+              key={key}
+              label={label}
+              required={mandatory}
+              name={key}
+              type={type}
+              value={values[key] || formState[key].defaultValue}
+              onChange={this.handleInputChange}
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      component="a"
+                      aria-label="Open link"
+                      disabled={!values[key]}
+                      href={values[key]}
+                      rel="noopener"
+                      target="_blank"
+                    >
+                      <OpenInNewIcon />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+          );
+          break;
+        default:
+          field = (
+            <TextField
+              key={key}
+              label={label}
+              required={mandatory}
+              name={key}
+              type={type}
+              value={values[key] || formState[key].defaultValue}
+              multiline={type === "textarea"}
+              onChange={this.handleInputChange}
+              fullWidth
+            />
+          );
+          break;
+      }
+      return field;
+    };
+
+    return fields.map(renderField);
+  };
+
   render() {
     const {
       isLoading,
       isError,
-      formState,
-      values,
       isNew,
       hasChanged
     } = this.state;
 
-    const shouldDisplayLink = (type, key) =>
-      !isNew && type === "url" && this.state.values[key];
+    // const shouldDisplayLink = (type, key) =>
+    //   !isNew && type === "url" && this.state.values[key];
 
     const canRemove = !isNew;
 
     return (
-      <React.Fragment>
+      <Container>
         {isLoading && "LOADING"}
         {isError && "ERROR"}
         {!isLoading && !isError && (
           <form onSubmit={e => e.preventDefault()}>
-            {Object.entries(formState).map(
-              ([key, { label, type, mandatory }]) => (
-                <div key={key}>
-                  <label htmlFor={key}>{`${label}${
-                    mandatory ? "*" : ""
-                  }:`}</label>
-                  {type !== "textarea" ? (
-                    <input
-                      name={key}
-                      type={type}
-                      onChange={this.handleInputChange}
-                      required={mandatory}
-                      value={values[key] || formState[key].defaultValue}
-                      checked={values[key] || formState[key].defaultValue}
-                    />
-                  ) : (
-                    <textarea
-                      name={key}
-                      onChange={this.handleInputChange}
-                      required={mandatory}
-                      value={values[key] || formState[key].defaultValue}
-                    />
-                  )}
-                  {shouldDisplayLink(type, key) && (
-                    <a
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      href={values[key]}
-                    >
-                      Lien
-                    </a>
-                  )}
-                </div>
-              )
-            )}
-            <Dates
+            {this.renderFields()}
+            {/* <Dates
               dates={values.dates || []}
               onSubmit={this.handleInputChange}
-            />
-            <button disabled={!hasChanged} onClick={this.handleSubmit}>
+            /> */}
+            <Button
+              disabled={!hasChanged}
+              onClick={this.handleSubmit}
+              variant="outlined"
+            >
               Sauvegarder
-            </button>
-            {canRemove && <button onClick={this.onRemove}>Supprimer</button>}
+            </Button>
+            {canRemove && (
+              <Button onClick={this.onRemove} variant="contained">
+                <DeleteIcon />
+                Supprimer
+              </Button>
+            )}
           </form>
         )}
-      </React.Fragment>
+      </Container>
     );
   }
 }

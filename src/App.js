@@ -1,21 +1,34 @@
 import React from "react";
-import { Router, Link } from "@reach/router";
+import { Router } from "@reach/router";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { makeStyles } from "@material-ui/core/styles";
 import Recipe from "./Recipe/index";
 // import NewRecipe from "./NewRecipe";
 import List from "./List";
+import HeaderBar from "./HeaderBar";
+import { Box } from "@material-ui/core";
+
+const useStyles = makeStyles({
+  box: {
+    position: "relative",
+    top: "66px"
+  }
+});
 
 export default function App() {
+  const classes = useStyles();
+  const [loading, setLoading] = React.useState(false);
   return (
-    <div className="main">
-      <nav>
-        <Link to="/">Liste</Link>   <Link to="/new">+ Nouvelle Recette</Link>
-      </nav>
-      <br />
-      <Router>
-        <List path="/" />
-        {/* <NewRecipe path="/new" /> */}
-        <Recipe path="/:id" />
-      </Router>
-    </div>
+    <>
+      <CssBaseline />
+      <HeaderBar loading={loading} />
+      <Box className={classes.box}>
+        <Router>
+          <List path="/" setLoading={setLoading} />
+          {/* <NewRecipe path="/new" /> */}
+          <Recipe path="/:id" setLoading={setLoading} />
+        </Router>
+      </Box>
+    </>
   );
 }

@@ -22,6 +22,12 @@ const formFields = {
     type: "checkbox",
     defaultValue: false,
     mandatory: false
+  },
+  dates: {
+    label: "Ajouter une date",
+    type: "date",
+    defaultValue: [],
+    mandatory: false
   }
 };
 export default formFields;
