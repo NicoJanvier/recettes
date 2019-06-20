@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import moment from "moment-with-locales-es6";
 import { Link as RouterLink } from "@reach/router";
 import {
   Typography,
@@ -15,6 +14,8 @@ import { green } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/styles";
 
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+
+import { getLastDateFromNow } from "../utils/date";
 
 const useStyles = makeStyles({
   cardAction: {
@@ -31,30 +32,21 @@ const useStyles = makeStyles({
   }
 });
 
-const getLastDate = (dates = []) => {
-  if (dates.length === 0) return false;
-  moment.locale("fr");
-  return dates
-    .map(date => moment(date))
-    .sort((a, b) => moment(a).isBefore(b))[0]
-    .fromNow(true);
-};
-
 function RecipeCard({ data }) {
   const classes = useStyles();
   const { title, _id, url, vegetarian: veg, dates } = data;
-  const lastDate = getLastDate(dates);
+  const lastDate = getLastDateFromNow(dates);
   return (
     <Card className={classes.card}>
       <CardContent>
         <Typography variant="h6" component="h2">
           {title}
         </Typography>
-          {lastDate && (
-            <Typography component="span">
-              <i>{lastDate}</i>
-            </Typography>
-          )}
+        {lastDate && (
+          <Typography component="span">
+            <i>{lastDate}</i>
+          </Typography>
+        )}
       </CardContent>
       <CardActions className={classes.cardAction}>
         {veg && <Avatar className={classes.avatar}>V</Avatar>}

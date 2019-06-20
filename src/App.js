@@ -11,7 +11,7 @@ import { Box } from "@material-ui/core";
 const useStyles = makeStyles({
   box: {
     position: "relative",
-    top: "66px"
+    top: "50px"
   }
 });
 
