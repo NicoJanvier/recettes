@@ -56,7 +56,11 @@ const useStyles = makeStyles({
     fontSize: "12px",
     color: "white",
     backgroundColor: green[800]
-  }
+  },
+  sortDateOn: {
+    color: "black"
+  },
+  sortDateOff: {},
 });
 
 export default function List({ setLoading }) {
@@ -90,17 +94,18 @@ export default function List({ setLoading }) {
           }
           return true;
         })
-        .sort(
-          (a, b) => {
-            if (sortDate) {
-              return compareLastDate(a.dates, b.dates);               
-            } else if(search) {
-              return a.title.toLowerCase().indexOf(lowSearch) - b.title.toLowerCase().indexOf(lowSearch);
-            } else {
-              return a.title.localeCompare(b.title);
-            }
+        .sort((a, b) => {
+          if (sortDate) {
+            return compareLastDate(a.dates, b.dates);
+          } else if (search) {
+            return (
+              a.title.toLowerCase().indexOf(lowSearch) -
+              b.title.toLowerCase().indexOf(lowSearch)
+            );
+          } else {
+            return a.title.localeCompare(b.title);
           }
-        );
+        });
       setRecipes(searchedRecipes);
     }
   }, [data, search, sortDate, vegFilter]);
@@ -113,33 +118,37 @@ export default function List({ setLoading }) {
         square
         component="div"
       >
-        <InputBase
-          className={classes.search}
-          placeholder="Rechercher..."
-          fullWidth={true}
-          value={search}
-          onChange={({ target: { value } }) => setSearch(value)}
-          endAdornment={
-            <>
-              {search ? (
-                <IconButton onClick={() => setSearch("")}>
-                  <ClearIcon />
+        <Container>
+          <InputBase
+            className={classes.search}
+            placeholder="Rechercher..."
+            fullWidth={true}
+            value={search}
+            onChange={({ target: { value } }) => setSearch(value)}
+            endAdornment={
+              <>
+                {search ? (
+                  <IconButton onClick={() => setSearch("")}>
+                    <ClearIcon />
+                  </IconButton>
+                ) : (
+                  <SearchIcon className={classes.searchIcon} />
+                )}
+                <Divider className={classes.divider} />
+                <IconButton onClick={() => setVegFilter(!vegFilter)}>
+                  <Avatar
+                    className={vegFilter ? classes.vegOn : classes.vegOff}
+                  >
+                    V
+                  </Avatar>
                 </IconButton>
-              ) : (
-                <SearchIcon className={classes.searchIcon} />
-              )}
-              <Divider className={classes.divider} />
-              <IconButton onClick={() => setVegFilter(!vegFilter)}>
-                <Avatar className={vegFilter ? classes.vegOn : classes.vegOff}>
-                  V
-                </Avatar>
-              </IconButton>
-              <IconButton onClick={() => setSortDate(!sortDate)}>
-                <SortIcon/>
-              </IconButton>
-            </>
-          }
-        />
+                <IconButton onClick={() => setSortDate(!sortDate)}>
+                  <SortIcon className={sortDate ? classes.sortDateOn : classes.sortDateOff}/>
+                </IconButton>
+              </>
+            }
+          />
+        </Container>
       </AppBar>
       <Container>
         {isError && "ERROR"}

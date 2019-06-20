@@ -103,6 +103,9 @@ class Recipe extends React.Component {
     } else {
       options.url = `${API_PATH}/recipes/${this.props.id}`;
       options.method = "put";
+      callback = () => {
+        navigate("/");
+      };
     }
     this.setState({ hasChanged: false });
     axios(options)
@@ -229,12 +232,7 @@ class Recipe extends React.Component {
   };
 
   render() {
-    const {
-      isLoading,
-      isError,
-      isNew,
-      hasChanged
-    } = this.state;
+    const { isLoading, isError, isNew, hasChanged } = this.state;
 
     // const shouldDisplayLink = (type, key) =>
     //   !isNew && type === "url" && this.state.values[key];

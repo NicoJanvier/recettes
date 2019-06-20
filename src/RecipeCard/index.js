@@ -52,7 +52,6 @@ function RecipeCard({ data }) {
         {veg && <Avatar className={classes.avatar}>V</Avatar>}
         {url && (
           <IconButton
-            size="small"
             href={url}
             target="_blank"
             rel="noreferrer noopener"

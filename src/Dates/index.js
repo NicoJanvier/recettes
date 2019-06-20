@@ -34,7 +34,7 @@ function Dates(props) {
   const [value, setValue] = React.useState(moment());
 
   const onAdd = React.useCallback(() => {
-    onSubmit(toEventLike([value.format("DD-MM-YYYY"), ...dates]));
+    onSubmit(toEventLike([value.format("YYYY-MM-DD"), ...dates]));
     setValue(moment());
   }, [value, dates, onSubmit]);
 

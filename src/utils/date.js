@@ -3,9 +3,12 @@ import moment from "moment-with-locales-es6";
 const getLastDate = (dates = []) => {
   if (dates.length === 0) return false;
   moment.locale("fr");
-  return dates
-    .map(date => moment(date))
-    .sort((a, b) => moment(a).isBefore(b))[0];
+  // return dates
+  //   .map(date => moment(date))
+  //   .sort((a, b) => moment(a).isBefore(b))[0];
+  const moments = dates.map(date => moment(date));
+  const sorted = moments.sort((a, b) => moment(a).isBefore(b));
+  return sorted[0]
 };
 
 const getLastDateFromNow = (dates = []) => {
