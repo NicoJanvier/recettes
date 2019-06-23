@@ -8,7 +8,7 @@ const getLastDate = (dates = []) => {
   //   .sort((a, b) => moment(a).isBefore(b))[0];
   const moments = dates.map(date => moment(date));
   const sorted = moments.sort((a, b) => moment(a).isBefore(b));
-  return sorted[0]
+  return sorted[0];
 };
 
 const getLastDateFromNow = (dates = []) => {
@@ -29,4 +29,28 @@ const compareLastDate = (datesA = [], datesB = []) => {
   }
 };
 
-export { getLastDate, getLastDateFromNow, compareLastDate };
+const compareDateProperty = (objA, objB) => {
+  if (moment(objA.date).isBefore(moment(objB.date))) {
+    return -1;
+  } else {
+    return 1;
+  }
+};
+
+const dateFormat = (date, format) => moment(date).format(format);
+
+const formatToDay = date => {
+  moment.locale("fr");
+  return dateFormat(date, "dddd DD MMM");
+};
+
+const addDays = (date, offset) => moment(date).add(offset, 'd').format("YYYY-MM-DD")
+
+export {
+  getLastDate,
+  getLastDateFromNow,
+  compareLastDate,
+  compareDateProperty,
+  formatToDay,
+  addDays
+};

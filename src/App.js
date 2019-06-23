@@ -7,6 +7,7 @@ import Recipe from "./Recipe/index";
 import List from "./List";
 import HeaderBar from "./HeaderBar";
 import { Box } from "@material-ui/core";
+import Planning from "./Planning";
 
 const useStyles = makeStyles({
   box: {
@@ -25,6 +26,7 @@ export default function App() {
       <Box className={classes.box}>
         <Router>
           <List path="/" setLoading={setLoading} />
+          <Planning path="/planning"/>
           {/* <NewRecipe path="/new" /> */}
           <Recipe path="/:id" setLoading={setLoading} />
         </Router>

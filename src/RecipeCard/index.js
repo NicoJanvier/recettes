@@ -32,7 +32,7 @@ const useStyles = makeStyles({
   }
 });
 
-function RecipeCard({ data }) {
+function RecipeCard({ data, noDate = false }) {
   const classes = useStyles();
   const { title, _id, url, vegetarian: veg, dates } = data;
   const lastDate = getLastDateFromNow(dates);
@@ -42,7 +42,7 @@ function RecipeCard({ data }) {
         <Typography variant="h6" component="h2">
           {title}
         </Typography>
-        {lastDate && (
+        {lastDate && !noDate && (
           <Typography component="span">
             <i>{lastDate}</i>
           </Typography>

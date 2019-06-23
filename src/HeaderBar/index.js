@@ -6,7 +6,8 @@ import {
   AppBar,
   Typography,
   IconButton,
-  LinearProgress
+  LinearProgress,
+  Button
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -44,6 +45,7 @@ function HeaderBar({ loading }) {
             >
               Mes Recettes
             </Typography>
+            <Button component={Link} to="/planning">Planning</Button>
             {location.pathname !== "/new" && (
               <IconButton component={Link} to="/new">
                 <AddIcon />
