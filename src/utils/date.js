@@ -44,7 +44,25 @@ const formatToDay = date => {
   return dateFormat(date, "dddd DD MMM");
 };
 
-const addDays = (date, offset) => moment(date).add(offset, 'd').format("YYYY-MM-DD")
+const addDays = (date, offset) =>
+  moment(date)
+    .add(offset, "d")
+    .format("YYYY-MM-DD");
+
+const isToday = date => moment(date).isSame(moment(), "day");
+
+const generateDateList = (start, end) => {
+  const startM = moment(start);
+  const endM = moment(end);
+  const days = [];
+  let day = startM;
+  while (day.isSameOrBefore(endM)) {
+    days.push(day.format("YYYY-MM-DD"));
+    day = day.clone().add(1, "d");
+  }
+  return days;
+};
+
 
 export {
   getLastDate,
@@ -52,5 +70,7 @@ export {
   compareLastDate,
   compareDateProperty,
   formatToDay,
-  addDays
+  addDays,
+  isToday,
+  generateDateList
 };
