@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
 import {
   Grid,
   Container,
@@ -8,11 +9,14 @@ import {
   FormControlLabel,
   Switch,
   IconButton,
-  Button
+  Button,
+  Fab,
+  Drawer
 } from "@material-ui/core";
 import RootRef from "@material-ui/core/RootRef";
 import { makeStyles } from "@material-ui/styles";
 import AddIcon from "@material-ui/icons/Add";
+import DateRangeIcon from "@material-ui/icons/DateRange";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
@@ -25,6 +29,7 @@ import {
   isToday
 } from "../utils/date";
 import RecipeCard from "../RecipeCard";
+import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
 
 const API_PATH = "http://localhost:8080/api";
@@ -36,9 +41,6 @@ const useStyles = makeStyles({
     top: "50px",
     zIndex: 1
   },
-  switchLabel: {
-    color: "black"
-  },
   gridRow: {
     borderRadius: "8px"
   },
@@ -49,15 +51,37 @@ const useStyles = makeStyles({
     order: 1,
     display: "flex",
     justifyContent: "flex-end"
+  },
+  fabBox: {
+    position: "sticky",
+    width: "fit-content",
+    bottom: "0px",
+    padding: "20px",
+    display: "flex",
+    flexFlow: "column-reverse",
+    alignItems: "center",
+  },
+  fab: {
+    marginTop: "16px",
+  },
+  rightPanel: {
+    borderLeft: "2px solid lightgrey",
+    position: "fixed",
+    right: "0px",
+    height: "100%",
+    overflow: "scroll",
+    transition: "width 2s",
+  },
+  leftPanel: {
+    transition: "width 2s",
   }
 });
 
 function Planning(props) {
   const classes = useStyles();
-  const [{ isLoading, isError, data }] = useDataApi(
-    { url: `${API_PATH}/recipes`, method: "get" },
-    []
-  );
+  const url = { url: `${API_PATH}/recipes`, method: "get" };
+  const [{ isLoading, isError, data }, setUrl] = useDataApi(url, []);
+  const refresh = () => setUrl(url);
   const [days, setDays] = React.useState([]);
 
   React.useEffect(() => {
@@ -90,14 +114,56 @@ function Planning(props) {
     }
   }, [data]);
 
-  const [editing, setEditing] = React.useState(false);
+  const [editing, setEditing] = React.useState(true);
+
+  // Scrolling
   const todayRef = React.useRef(null);
   const executeScroll = () => scrollToRef(todayRef);
 
+  // Draggable
   const onDragEnd = result => {
     console.log(result);
     if (!result.destination) {
       return;
+    }
+    // debugger;
+    const newDate = result.destination.droppableId;
+    const newIndex = result.destination.index;
+    const oldDate = result.source.droppableId;
+    const recipeId = result.draggableId.split("_")[0];
+
+    if (newDate !== oldDate) {
+      const oldRow = days.find(({ date }) => date === oldDate);
+      const recipe = oldRow.recipes.find(({ _id }) => _id === recipeId);
+      const { id, title, description, dates: oldDates, vegetarian } = recipe;
+      const dates = [...oldDates.filter(date => date !== oldDate), newDate];
+      const options = {
+        url: `${API_PATH}/recipes/${recipeId}`,
+        method: "put",
+        data: {
+          id,
+          title,
+          description,
+          vegetarian,
+          dates
+        }
+      };
+
+      const updatedDays = [...days];
+      const oldDay = updatedDays.find(({ date }) => date === oldDate);
+      const newDay = updatedDays.find(({ date }) => date === newDate);
+      oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
+      newDay.recipes.splice(newIndex, 0, recipe);
+      setDays(updatedDays);
+
+      axios(options)
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log(error);
+          refresh();
+        });
     }
   };
 
@@ -109,28 +175,16 @@ function Planning(props) {
     //   background: "rgb(235,235,235)"
     // })
   });
-  
+
   return (
-    <>
-      <AppBar className={classes.appBar} elevation={1} square component="div">
-        <Container>
-          <FormControlLabel
-            label="Éditer"
-            className={classes.switchLabel}
-            control={
-              <Switch checked={editing} onChange={() => setEditing(!editing)} />
-            }
-          />
-          <Button onClick={() => executeScroll()}>Scroll</Button>
-        </Container>
-      </AppBar>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Container>
-          {isError && "ERROR"}
-          <Grid container spacing={4}>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Container>
+        {isError && "ERROR"}
+        <Grid container>
+          <Grid container item spacing={4} xs={!editing ? 12 : 8}  className={classes.leftPanel}>
             {days.map(({ date, recipes }) => {
               return (
-                <>
+                <React.Fragment key={date}>
                   {isToday(date) && <div ref={todayRef} />}
                   {(recipes.length > 0 || editing) && (
                     <Grid item container xs={12}>
@@ -194,13 +248,37 @@ function Planning(props) {
                       </Droppable>
                     </Grid>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </Grid>
-        </Container>
-      </DragDropContext>
-    </>
+          {editing && (
+            <Grid item xs={4} className={classes.rightPanel}>
+              <List side/>
+            </Grid>
+          )}
+        </Grid>
+      </Container>
+      {!isLoading && !isError && (
+        <div className={classes.fabBox}>
+          <Fab
+            color="primary"
+            className={classes.fab}
+            onClick={() => setEditing(!editing)}
+          >
+            <AddIcon />
+          </Fab>
+          <Fab
+            color="secondary"
+            className={classes.fab}
+            onClick={() => executeScroll()}
+            size="small"
+          >
+            <DateRangeIcon />
+          </Fab>
+        </div>
+      )}
+    </DragDropContext>
   );
 }
 

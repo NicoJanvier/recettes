@@ -16,6 +16,7 @@
     "morgan": "^1.9.1",
     "nodemon": "^1.19.1",
     "react": "^16.8.6",
+    "react-beautiful-dnd": "^11.0.4",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
   },
