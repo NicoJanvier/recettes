@@ -32,12 +32,12 @@ const useStyles = makeStyles({
   }
 });
 
-function RecipeCard({ data, noDate = false }) {
+function RecipeCard({ data, noDate = false}) {
   const classes = useStyles();
   const { title, _id, url, vegetarian: veg, dates } = data;
   const lastDate = getLastDateFromNow(dates);
   return (
-    <Card className={classes.card}>
+    <Card>
       <CardContent>
         <Typography variant="h6" component="h2">
           {title}

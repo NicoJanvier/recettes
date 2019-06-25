@@ -10,8 +10,11 @@ import {
   IconButton,
   Button
 } from "@material-ui/core";
+import RootRef from "@material-ui/core/RootRef";
 import { makeStyles } from "@material-ui/styles";
 import AddIcon from "@material-ui/icons/Add";
+
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
 import useDataApi from "../hooks/useDataApi";
 import {
@@ -40,8 +43,12 @@ const useStyles = makeStyles({
     borderRadius: "8px"
   },
   gridRowEditing: {
-    // padding: "12px",
     border: "2px dashed lightgrey"
+  },
+  addBtnCard: {
+    order: 1,
+    display: "flex",
+    justifyContent: "flex-end"
   }
 });
 
@@ -52,6 +59,7 @@ function Planning(props) {
     []
   );
   const [days, setDays] = React.useState([]);
+
   React.useEffect(() => {
     if (data && data.data) {
       const allRecipes = data.data;
@@ -84,15 +92,27 @@ function Planning(props) {
 
   const [editing, setEditing] = React.useState(false);
   const todayRef = React.useRef(null);
-  const executeScroll = () => scrollToRef(todayRef)
+  const executeScroll = () => scrollToRef(todayRef);
+
+  const onDragEnd = result => {
+    console.log(result);
+    if (!result.destination) {
+      return;
+    }
+  };
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    // styles we need to apply on draggables
+    ...draggableStyle
+
+    // ...(isDragging && {
+    //   background: "rgb(235,235,235)"
+    // })
+  });
+  
   return (
     <>
-      <AppBar
-        className={classes.appBar}
-        elevation={1}
-        square
-        component="div"
-      >
+      <AppBar className={classes.appBar} elevation={1} square component="div">
         <Container>
           <FormControlLabel
             label="Éditer"
@@ -104,47 +124,82 @@ function Planning(props) {
           <Button onClick={() => executeScroll()}>Scroll</Button>
         </Container>
       </AppBar>
-      <Container>
-        {isError && "ERROR"}
-        <Grid container spacing={4}>
-          {days.map(({ date, recipes }) => {
-            return (
-              <>
-                {isToday(date) && <div ref={todayRef}/>}
-                {(recipes.length > 0 || editing) && (
-                  <Grid item container xs={12}>
-                    <Grid item xs={2} className={classes.gridItemDate}>
-                      <Typography>{formatToDay(date)}</Typography>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Container>
+          {isError && "ERROR"}
+          <Grid container spacing={4}>
+            {days.map(({ date, recipes }) => {
+              return (
+                <>
+                  {isToday(date) && <div ref={todayRef} />}
+                  {(recipes.length > 0 || editing) && (
+                    <Grid item container xs={12}>
+                      <Grid item xs={2} className={classes.gridItemDate}>
+                        <Typography>{formatToDay(date)}</Typography>
+                      </Grid>
+                      <Droppable droppableId={date}>
+                        {provided => (
+                          <RootRef rootRef={provided.innerRef}>
+                            <Grid
+                              item
+                              container
+                              xs={10}
+                              spacing={2}
+                              className={`${classes.gridRow} 
+                              ${editing ? classes.gridRowEditing : ""}`}
+                            >
+                              {recipes.map((recipe, index) => {
+                                const id = `${recipe._id}_${date}_${index}`;
+                                return (
+                                  <Draggable
+                                    key={id}
+                                    index={index}
+                                    draggableId={id}
+                                    isDragDisabled={!editing}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <RootRef rootRef={provided.innerRef}>
+                                        <Grid
+                                          item
+                                          xs={12}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          style={getItemStyle(
+                                            snapshot.isDragging,
+                                            provided.draggableProps.style
+                                          )}
+                                        >
+                                          <RecipeCard data={recipe} noDate />
+                                        </Grid>
+                                      </RootRef>
+                                    )}
+                                  </Draggable>
+                                );
+                              })}
+                              {editing && (
+                                <Grid
+                                  item
+                                  xs={12}
+                                  className={classes.addBtnCard}
+                                >
+                                  <IconButton color="secondary">
+                                    <AddIcon />
+                                  </IconButton>
+                                </Grid>
+                              )}
+                              {provided.placeholder}
+                            </Grid>
+                          </RootRef>
+                        )}
+                      </Droppable>
                     </Grid>
-                    <Grid
-                      item
-                      container
-                      xs={10}
-                      spacing={2}
-                      className={`${classes.gridRow} 
-                      ${editing ? classes.gridRowEditing : ""}`}
-                    >
-                      {recipes.length ? (
-                        recipes.map(recipe => (
-                          <Grid item xs={12}>
-                            <RecipeCard data={recipe} noDate />
-                          </Grid>
-                        ))
-                      ) : (
-                        <Grid item xs={12}>
-                          <IconButton color="secondary">
-                            <AddIcon />
-                          </IconButton>
-                        </Grid>
-                      )}
-                    </Grid>
-                  </Grid>
-                )}
-              </>
-            );
-          })}
-        </Grid>
-      </Container>
+                  )}
+                </>
+              );
+            })}
+          </Grid>
+        </Container>
+      </DragDropContext>
     </>
   );
 }
