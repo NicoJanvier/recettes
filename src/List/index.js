@@ -11,11 +11,15 @@ import {
   Avatar,
   IconButton
 } from "@material-ui/core";
+import RootRef from "@material-ui/core/RootRef";
 import { makeStyles } from "@material-ui/styles";
 import { green } from "@material-ui/core/colors";
 import SearchIcon from "@material-ui/icons/Search";
 import ClearIcon from "@material-ui/icons/Clear";
 import SortIcon from "@material-ui/icons/Sort";
+
+import { Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
+
 import RecipeCard from "../RecipeCard";
 import { compareLastDate } from "../utils/date";
 
@@ -28,7 +32,7 @@ const useStyles = makeStyles({
   searchBar: {
     position: "sticky",
     background: "white",
-    top: "50px",
+    // top: "50px",
     zIndex: 1
   },
   gridContainer: {
@@ -60,10 +64,10 @@ const useStyles = makeStyles({
   sortDateOn: {
     color: "black"
   },
-  sortDateOff: {},
+  sortDateOff: {}
 });
 
-export default function List({ setLoading }) {
+export default function List({ setLoading = () => {}, draggable = false }) {
   const classes = useStyles();
   const [{ isLoading, isError, data }] = useDataApi(
     { url: `${API_PATH}/recipes`, method: "get" },
@@ -143,7 +147,11 @@ export default function List({ setLoading }) {
                   </Avatar>
                 </IconButton>
                 <IconButton onClick={() => setSortDate(!sortDate)}>
-                  <SortIcon className={sortDate ? classes.sortDateOn : classes.sortDateOff}/>
+                  <SortIcon
+                    className={
+                      sortDate ? classes.sortDateOn : classes.sortDateOff
+                    }
+                  />
                 </IconButton>
               </>
             }
@@ -153,11 +161,36 @@ export default function List({ setLoading }) {
       <Container>
         {isError && "ERROR"}
         <Grid container spacing={2} className={classes.gridContainer}>
-          {recipes.map(data => (
-            <Grid item xs={12} key={data._id}>
-              <RecipeCard data={data} />
-            </Grid>
-          ))}
+          {draggable
+            ? recipes.map((recipe, index) => {
+                const id = `${recipe._id}_${index}`;
+                return (
+                  <Draggable
+                    key={id}
+                    index={index}
+                    draggableId={id}
+                  >
+                    {(provided, snapshot) => (
+                      <RootRef rootRef={provided.innerRef}>
+                        <Grid
+                          item
+                          xs={12}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={provided.draggableProps.style}
+                        >
+                          <RecipeCard data={recipe} />
+                        </Grid>
+                      </RootRef>
+                    )}
+                  </Draggable>
+                );
+              })
+            : recipes.map(data => (
+                <Grid item xs={12} key={data._id}>
+                  <RecipeCard data={data} />
+                </Grid>
+              ))}
         </Grid>
       </Container>
     </>

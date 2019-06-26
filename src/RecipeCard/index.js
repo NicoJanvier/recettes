@@ -29,15 +29,18 @@ const useStyles = makeStyles({
     fontSize: "12px",
     marginRight: "auto",
     marginLeft: "6px"
-  }
+  },
+  selectedCard: {
+    backgroundColor: green[100],
+  },
 });
 
-function RecipeCard({ data, noDate = false}) {
+function RecipeCard({ data, noDate = false, selected = false}) {
   const classes = useStyles();
   const { title, _id, url, vegetarian: veg, dates } = data;
   const lastDate = getLastDateFromNow(dates);
   return (
-    <Card>
+    <Card className={selected ? classes.selectedCard : ""}>
       <CardContent>
         <Typography variant="h6" component="h2">
           {title}

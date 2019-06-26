@@ -17,6 +17,7 @@ import RootRef from "@material-ui/core/RootRef";
 import { makeStyles } from "@material-ui/styles";
 import AddIcon from "@material-ui/icons/Add";
 import DateRangeIcon from "@material-ui/icons/DateRange";
+import ClearIcon from "@material-ui/icons/Clear";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
@@ -59,10 +60,10 @@ const useStyles = makeStyles({
     padding: "20px",
     display: "flex",
     flexFlow: "column-reverse",
-    alignItems: "center",
+    alignItems: "center"
   },
   fab: {
-    marginTop: "16px",
+    marginTop: "16px"
   },
   rightPanel: {
     borderLeft: "2px solid lightgrey",
@@ -71,9 +72,43 @@ const useStyles = makeStyles({
     height: "100%",
     overflow: "scroll",
     transition: "width 2s",
+    flex: "0 0 auto"
   },
   leftPanel: {
-    transition: "width 2s",
+    transition: "width 2s"
+  },
+  // Remove Button
+  recipeCard: {
+    position: "relative",
+    "&:hover": {
+      "& .MuiCard-root": {
+        backgroundColor: "rgba(0, 0, 0, 0.01)"
+      },
+      "& button": {
+        width: "25px",
+        height: "25px",
+        transform: "scale(1)",
+        "& svg": {
+          display: "block",
+        }
+      }
+    }
+  },
+  rmvBtn: {
+    position: "absolute",
+    top: "4px",
+    right: "4px",
+    minHeight: "0px"
+  },
+  rmvBtnSize: {
+    width: "25px",
+    height: "25px",
+    transform: "scale(0)",
+    transition: "all 0.5s"
+  },
+  rmvIcon: {
+    width: "0.8em",
+    height: "0.8em"
   }
 });
 
@@ -126,15 +161,14 @@ function Planning(props) {
     if (!result.destination) {
       return;
     }
-    // debugger;
     const newDate = result.destination.droppableId;
     const newIndex = result.destination.index;
     const oldDate = result.source.droppableId;
     const recipeId = result.draggableId.split("_")[0];
 
     if (newDate !== oldDate) {
-      const oldRow = days.find(({ date }) => date === oldDate);
-      const recipe = oldRow.recipes.find(({ _id }) => _id === recipeId);
+      const recipe = data.data.find(({ _id }) => _id === recipeId);
+
       const { id, title, description, dates: oldDates, vegetarian } = recipe;
       const dates = [...oldDates.filter(date => date !== oldDate), newDate];
       const options = {
@@ -152,7 +186,9 @@ function Planning(props) {
       const updatedDays = [...days];
       const oldDay = updatedDays.find(({ date }) => date === oldDate);
       const newDay = updatedDays.find(({ date }) => date === newDate);
-      oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
+      if (oldDay) {
+        oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
+      }
       newDay.recipes.splice(newIndex, 0, recipe);
       setDays(updatedDays);
 
@@ -176,12 +212,47 @@ function Planning(props) {
     // })
   });
 
+  const onRemove = (recipe, srcDate) => {
+    const { _id: recipeId, id, title, description, vegetarian, dates} = recipe;
+    
+    const updatedDays = [...days];    
+    const oldDay = updatedDays.find(({ date }) => date === srcDate);
+    oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
+    setDays(updatedDays);
+
+    const options = {
+      url: `${API_PATH}/recipes/${recipeId}`,
+      method: "put",
+      data: {
+        id,
+        title,
+        description,
+        vegetarian,
+        dates: dates.filter(date => date !== srcDate)
+      }
+    };
+    axios(options)
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(error) {
+      console.log(error);
+      refresh();
+    });
+  }
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
         {isError && "ERROR"}
         <Grid container>
-          <Grid container item spacing={4} xs={!editing ? 12 : 8}  className={classes.leftPanel}>
+          <Grid
+            container
+            item
+            spacing={4}
+            xs={!editing ? 12 : 8}
+            className={classes.leftPanel}
+          >
             {days.map(({ date, recipes }) => {
               return (
                 <React.Fragment key={date}>
@@ -222,15 +293,33 @@ function Planning(props) {
                                             snapshot.isDragging,
                                             provided.draggableProps.style
                                           )}
+                                          className={classes.recipeCard}
                                         >
-                                          <RecipeCard data={recipe} noDate />
+                                          <RecipeCard
+                                            data={recipe}
+                                            noDate
+                                            selected={isToday(date)}
+                                          />
+                                          <Fab
+                                            color="secondary"
+                                            size="small"
+                                            className={classes.rmvBtn}
+                                            classes={{
+                                              sizeSmall: classes.rmvBtnSize
+                                            }}
+                                            onClick={() => onRemove(recipe, date)}
+                                          >
+                                            <ClearIcon
+                                              className={classes.rmvIcon}
+                                            />
+                                          </Fab>
                                         </Grid>
                                       </RootRef>
                                     )}
                                   </Draggable>
                                 );
                               })}
-                              {editing && (
+                              {/* {editing && (
                                 <Grid
                                   item
                                   xs={12}
@@ -240,7 +329,7 @@ function Planning(props) {
                                     <AddIcon />
                                   </IconButton>
                                 </Grid>
-                              )}
+                              )} */}
                               {provided.placeholder}
                             </Grid>
                           </RootRef>
@@ -254,7 +343,14 @@ function Planning(props) {
           </Grid>
           {editing && (
             <Grid item xs={4} className={classes.rightPanel}>
-              <List side/>
+              <Droppable droppableId="search-list">
+                {provided => (
+                  <RootRef rootRef={provided.innerRef}>
+                    <List draggable />
+                    {/* {provided.placeholder} */}
+                  </RootRef>
+                )}
+              </Droppable>
             </Grid>
           )}
         </Grid>
