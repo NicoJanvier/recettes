@@ -1,12 +1,12 @@
 const express = require("express");
+require('dotenv').config();
 const mongoose = require("mongoose");
 const Recipe = require("./recipe");
-const DB_ROUTE = require("./db.secret.js")
 
 const router = express.Router();
 
 // this is our MongoDB database
-const dbRoute = DB_ROUTE;
+const dbRoute = process.env.DB_MONGO;
 
 // connects our back end code with the database
 mongoose.connect(dbRoute, { useNewUrlParser: true });
