@@ -41,7 +41,11 @@ const dateFormat = (date, format) => moment(date).format(format);
 
 const formatToDay = date => {
   moment.locale("fr");
-  return dateFormat(date, "dddd DD MMM");
+  return dateFormat(date, "DD MMM");
+};
+const formatToDayOfWeek = date => {
+  moment.locale("fr");
+  return dateFormat(date, "dddd");
 };
 
 const addDays = (date, offset) =>
@@ -70,6 +74,7 @@ export {
   compareLastDate,
   compareDateProperty,
   formatToDay,
+  formatToDayOfWeek,
   addDays,
   isToday,
   generateDateList

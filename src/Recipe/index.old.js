@@ -5,7 +5,7 @@ import { navigate } from "@reach/router";
 import useDataApi from "../hooks/useDataApi";
 import formFields from "../utils/formFields";
 
-const API_PATH = "http://localhost:8080/api";
+const API_PATH = "/api";
 
 function useFormData(id) {
   const [{ isLoading, isError, data }] = useDataApi(

@@ -9,7 +9,6 @@ import {
   LinearProgress,
   Button
 } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
 import MenuIcon from "@material-ui/icons/Menu";
 
 const useStyles = makeStyles({
@@ -45,11 +44,18 @@ function HeaderBar({ loading }) {
             >
               Mes Recettes
             </Typography>
-            <Button component={Link} to="/planning">Planning</Button>
+            <Button
+              href="https://shoppinglist.google.com"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Shopping List
+            </Button>
+            <Button component={Link} to="/planning">
+              Planning
+            </Button>
             {location.pathname !== "/new" && (
-              <IconButton component={Link} to="/new">
-                <AddIcon />
-              </IconButton>
+              <Button component={Link} to="/new">Nouveau</Button>
             )}
             <div />
           </AppBar>

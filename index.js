@@ -5,8 +5,6 @@ const path = require("path");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const router = require("./express/router");
-
-const API_PORT = 8080;
 const app = express();
 
 
@@ -25,16 +23,13 @@ app.use(function(req, res, next) {
 
 app.use(express.static(path.join(__dirname, "build")));
 
-app.get("/ping", function(req, res) {
-  return res.send("pong");
-});
-
-app.get("/", function(req, res) {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
 
 // append /api for our http requests
 app.use("/api", router);
 
+app.get("*", function(req, res) {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 // launch our backend into a port
-app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
+const port = process.env.PORT || 8080;
+app.listen(port, () => console.log(`LISTENING ON PORT ${port}`));

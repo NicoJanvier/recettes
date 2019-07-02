@@ -23,7 +23,7 @@ import { Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp
 import RecipeCard from "../RecipeCard";
 import { compareLastDate } from "../utils/date";
 
-const API_PATH = "http://localhost:8080/api";
+const API_PATH = "/api";
 
 const useStyles = makeStyles({
   search: {

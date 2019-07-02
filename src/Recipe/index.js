@@ -19,7 +19,7 @@ import formFields from "../utils/formFields";
 import { navigate } from "@reach/router";
 import Dates from "../Dates/";
 
-const API_PATH = "http://localhost:8080/api";
+const API_PATH = "/api";
 
 class Recipe extends React.Component {
   constructor(props) {
@@ -104,7 +104,8 @@ class Recipe extends React.Component {
       options.url = `${API_PATH}/recipes/${this.props.id}`;
       options.method = "put";
       callback = () => {
-        navigate("/");
+        // navigate("/");
+        window.history.back();
       };
     }
     this.setState({ hasChanged: false });

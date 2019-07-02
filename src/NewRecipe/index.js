@@ -3,7 +3,7 @@ import axios from "axios";
 import { navigate } from "@reach/router";
 import formFields from "../utils/formFields";
 
-const API_PATH = "http://localhost:8080/api";
+const API_PATH = "/api";
 
 const NewRecipe = () => {
   const [formState, setState] = React.useState({ ...formFields, values: {} });

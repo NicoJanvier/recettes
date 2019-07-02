@@ -25,6 +25,7 @@ import useDataApi from "../hooks/useDataApi";
 import {
   compareDateProperty,
   formatToDay,
+  formatToDayOfWeek,
   addDays,
   generateDateList,
   isToday
@@ -33,7 +34,7 @@ import RecipeCard from "../RecipeCard";
 import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
 
-const API_PATH = "http://localhost:8080/api";
+const API_PATH = "/api";
 
 const useStyles = makeStyles({
   appBar: {
@@ -258,9 +259,10 @@ function Planning(props) {
                 <React.Fragment key={date}>
                   {isToday(date) && <div ref={todayRef} />}
                   {(recipes.length > 0 || editing) && (
-                    <Grid item container xs={12}>
+                    <Grid item container xs={12} id={date}>
                       <Grid item xs={2} className={classes.gridItemDate}>
                         <Typography>{formatToDay(date)}</Typography>
+                        <Typography>{formatToDayOfWeek(date)}</Typography>
                       </Grid>
                       <Droppable droppableId={date}>
                         {provided => (

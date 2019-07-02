@@ -52,7 +52,6 @@ function Dates(props) {
               <KeyboardDatePicker
                 value={value}
                 onChange={date => setValue(date || moment())}
-                maxDate={new Date()}
                 format="DD/MM/YYYY"
                 label={label}
                 required={mandatory}
