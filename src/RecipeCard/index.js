@@ -35,7 +35,7 @@ const useStyles = makeStyles({
   },
 });
 
-function RecipeCard({ data, noDate = false, selected = false}) {
+function RecipeCard({ data, noDate = false, selected = false, onPick}) {
   const classes = useStyles();
   const { title, _id, url, vegetarian: veg, dates } = data;
   const lastDate = getLastDateFromNow(dates);
@@ -65,6 +65,7 @@ function RecipeCard({ data, noDate = false, selected = false}) {
         <Button component={RouterLink} to={`/${_id}`}>
           PLUS
         </Button>
+        {!!onPick && <Button onClick={() => onPick(data)}>AJOUTER</Button>}
       </CardActions>
     </Card>
   );
