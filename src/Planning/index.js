@@ -11,10 +11,13 @@ import {
   IconButton,
   Button,
   Fab,
-  Drawer
+  Drawer,
+  Dialog
 } from "@material-ui/core";
 import RootRef from "@material-ui/core/RootRef";
 import { makeStyles } from "@material-ui/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -65,18 +68,6 @@ const useStyles = makeStyles({
   },
   fab: {
     marginTop: "16px"
-  },
-  rightPanel: {
-    borderLeft: "2px solid lightgrey",
-    position: "fixed",
-    right: "0px",
-    height: "100%",
-    overflow: "scroll",
-    transition: "width 2s",
-    flex: "0 0 auto"
-  },
-  leftPanel: {
-    transition: "width 2s"
   },
   // Remove Button
   recipeCard: {
@@ -173,20 +164,6 @@ function Planning({ setLoading }) {
     if (newDate !== oldDate) {
       const recipe = data.data.find(({ _id }) => _id === recipeId);
 
-      const { id, title, description, dates: oldDates, vegetarian } = recipe;
-      const dates = [...oldDates.filter(date => date !== oldDate), newDate];
-      const options = {
-        url: `${API_PATH}/recipes/${recipeId}`,
-        method: "put",
-        data: {
-          id,
-          title,
-          description,
-          vegetarian,
-          dates
-        }
-      };
-
       const updatedDays = [...days];
       const oldDay = updatedDays.find(({ date }) => date === oldDate);
       const newDay = updatedDays.find(({ date }) => date === newDate);
@@ -196,14 +173,11 @@ function Planning({ setLoading }) {
       newDay.recipes.splice(newIndex, 0, recipe);
       setDays(updatedDays);
 
-      axios(options)
-        .then(function(response) {
-          console.log(response);
-        })
-        .catch(function(error) {
-          console.log(error);
-          refresh();
-        });
+      const newDates = [
+        ...recipe.dates.filter(date => date !== oldDate),
+        newDate
+      ];
+      updateRecipeDates(recipe, newDates);
     }
   };
 
@@ -217,22 +191,30 @@ function Planning({ setLoading }) {
   });
 
   const onRemove = (recipe, srcDate) => {
-    const { _id: recipeId, id, title, description, vegetarian, dates } = recipe;
+    const { _id: recipeId, dates } = recipe;
 
     const updatedDays = [...days];
     const oldDay = updatedDays.find(({ date }) => date === srcDate);
     oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
     setDays(updatedDays);
 
+    const newDates = dates.filter(date => date !== srcDate);
+    updateRecipeDates(recipe, newDates);
+  };
+
+  const [isDialogOpen, setDialogOpen] = React.useState(false);
+
+  const updateRecipeDates = async (recipe, dates) => {
+    const { _id: strictId, id, title, description, vegetarian } = recipe;
     const options = {
-      url: `${API_PATH}/recipes/${recipeId}`,
+      url: `${API_PATH}/recipes/${strictId}`,
       method: "put",
       data: {
         id,
         title,
         description,
         vegetarian,
-        dates: dates.filter(date => date !== srcDate)
+        dates
       }
     };
     axios(options)
@@ -245,122 +227,125 @@ function Planning({ setLoading }) {
       });
   };
 
+  const [pickDate, setPickDate] = React.useState(null);
+  const onClickPick = date => {
+    setPickDate(date);
+    setDialogOpen(true);
+  };
+  const onPick = recipe => {
+    const updatedDays = [...days];
+    const targetDay = updatedDays.find(({ date }) => date === pickDate);
+    targetDay.recipes.push(recipe);
+    setDays(updatedDays);
+    const newDates = [...recipe.dates, pickDate];
+    updateRecipeDates(recipe, newDates);
+    setDialogOpen(false);
+  };
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
         {isError && "ERROR"}
-        <Grid container>
-          <Grid
-            container
-            item
-            spacing={4}
-            xs={!editing ? 12 : 8}
-            className={classes.leftPanel}
-          >
-            {days.map(({ date, recipes }) => {
-              return (
-                <React.Fragment key={date}>
-                  {isToday(date) && <div ref={todayRef} />}
-                  {(recipes.length > 0 || editing) && (
-                    <Grid item container xs={12} id={date}>
-                      <Grid item xs={2} className={classes.gridItemDate}>
-                        <Typography>{formatToDay(date)}</Typography>
-                        <Typography>{formatToDayOfWeek(date)}</Typography>
-                      </Grid>
-                      <Droppable droppableId={date}>
-                        {provided => (
-                          <RootRef rootRef={provided.innerRef}>
-                            <Grid
-                              item
-                              container
-                              xs={10}
-                              spacing={2}
-                              className={`${classes.gridRow} 
-                              ${editing ? classes.gridRowEditing : ""}`}
-                            >
-                              {recipes.map((recipe, index) => {
-                                const id = `${recipe._id}_${date}_${index}`;
-                                return (
-                                  <Draggable
-                                    key={id}
-                                    index={index}
-                                    draggableId={id}
-                                    isDragDisabled={!editing}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <RootRef rootRef={provided.innerRef}>
-                                        <Grid
-                                          item
-                                          xs={12}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                          style={getItemStyle(
-                                            snapshot.isDragging,
-                                            provided.draggableProps.style
-                                          )}
-                                          className={classes.recipeCard}
-                                        >
-                                          <RecipeCard
-                                            data={recipe}
-                                            noDate
-                                            selected={isToday(date)}
-                                          />
-                                          <Fab
-                                            color="secondary"
-                                            size="small"
-                                            className={classes.rmvBtn}
-                                            classes={{
-                                              sizeSmall: classes.rmvBtnSize
-                                            }}
-                                            onClick={() =>
-                                              onRemove(recipe, date)
-                                            }
-                                          >
-                                            <ClearIcon
-                                              className={classes.rmvIcon}
-                                            />
-                                          </Fab>
-                                        </Grid>
-                                      </RootRef>
-                                    )}
-                                  </Draggable>
-                                );
-                              })}
-                              {/* {editing && (
-                                <Grid
-                                  item
-                                  xs={12}
-                                  className={classes.addBtnCard}
-                                >
-                                  <IconButton color="secondary">
-                                    <AddIcon />
-                                  </IconButton>
-                                </Grid>
-                              )} */}
-                              {provided.placeholder}
-                            </Grid>
-                          </RootRef>
-                        )}
-                      </Droppable>
+        <Grid container item spacing={4} xs={12} className={classes.leftPanel}>
+          {days.map(({ date, recipes }) => {
+            return (
+              <React.Fragment key={date}>
+                {isToday(date) && <div ref={todayRef} />}
+                {(recipes.length > 0 || editing) && (
+                  <Grid item container xs={12} id={date}>
+                    <Grid item xs={2} className={classes.gridItemDate}>
+                      <Typography>{formatToDay(date)}</Typography>
+                      <Typography>{formatToDayOfWeek(date)}</Typography>
                     </Grid>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </Grid>
-          {editing && (
-            <Grid item xs={4} className={classes.rightPanel}>
-              <Droppable droppableId="search-list">
-                {provided => (
-                  <RootRef rootRef={provided.innerRef}>
-                    <List draggable />
-                    {/* {provided.placeholder} */}
-                  </RootRef>
+                    <Droppable droppableId={date}>
+                      {provided => (
+                        <RootRef rootRef={provided.innerRef}>
+                          <Grid
+                            item
+                            container
+                            xs={10}
+                            spacing={2}
+                            className={`${classes.gridRow} 
+                              ${editing ? classes.gridRowEditing : ""}`}
+                          >
+                            {recipes.map((recipe, index) => {
+                              const id = `${recipe._id}_${date}_${index}`;
+                              return (
+                                <Draggable
+                                  key={id}
+                                  index={index}
+                                  draggableId={id}
+                                  isDragDisabled={!editing}
+                                >
+                                  {(provided, snapshot) => (
+                                    <RootRef rootRef={provided.innerRef}>
+                                      <Grid
+                                        item
+                                        xs={12}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        style={getItemStyle(
+                                          snapshot.isDragging,
+                                          provided.draggableProps.style
+                                        )}
+                                        className={classes.recipeCard}
+                                      >
+                                        <RecipeCard
+                                          data={recipe}
+                                          noDate
+                                          selected={isToday(date)}
+                                        />
+                                        <Fab
+                                          color="secondary"
+                                          size="small"
+                                          className={classes.rmvBtn}
+                                          classes={{
+                                            sizeSmall: classes.rmvBtnSize
+                                          }}
+                                          onClick={() => onRemove(recipe, date)}
+                                        >
+                                          <ClearIcon
+                                            className={classes.rmvIcon}
+                                          />
+                                        </Fab>
+                                      </Grid>
+                                    </RootRef>
+                                  )}
+                                </Draggable>
+                              );
+                            })}
+                            {editing && (
+                              <Grid item xs={12} className={classes.addBtnCard}>
+                                <IconButton
+                                  color="secondary"
+                                  onClick={() => onClickPick(date)}
+                                >
+                                  <AddIcon />
+                                </IconButton>
+                              </Grid>
+                            )}
+                            {provided.placeholder}
+                          </Grid>
+                        </RootRef>
+                      )}
+                    </Droppable>
+                  </Grid>
                 )}
-              </Droppable>
-            </Grid>
-          )}
+              </React.Fragment>
+            );
+          })}
         </Grid>
+        <Dialog
+          open={isDialogOpen}
+          onClose={() => setDialogOpen(false)}
+          fullScreen={fullScreen}
+          aria-labelledby="responsive-dialog-title"
+        >
+          <List onPick={onPick} />
+        </Dialog>
       </Container>
       {!isLoading && !isError && (
         <div className={classes.fabBox}>
