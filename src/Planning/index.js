@@ -88,10 +88,10 @@ const useStyles = makeStyles({
       "& button": {
         width: "25px",
         height: "25px",
-        transform: "scale(1)",
-        "& svg": {
-          display: "block",
-        }
+        transform: "scale(1)"
+        // "& svg": {
+        //   display: "block",
+        // }
       }
     }
   },
@@ -113,10 +113,13 @@ const useStyles = makeStyles({
   }
 });
 
-function Planning(props) {
+function Planning({ setLoading }) {
   const classes = useStyles();
   const url = { url: `${API_PATH}/recipes`, method: "get" };
   const [{ isLoading, isError, data }, setUrl] = useDataApi(url, []);
+  React.useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
   const refresh = () => setUrl(url);
   const [days, setDays] = React.useState([]);
 
@@ -150,7 +153,7 @@ function Planning(props) {
     }
   }, [data]);
 
-  const [editing, setEditing] = React.useState(true);
+  const [editing, setEditing] = React.useState(false);
 
   // Scrolling
   const todayRef = React.useRef(null);
@@ -214,9 +217,9 @@ function Planning(props) {
   });
 
   const onRemove = (recipe, srcDate) => {
-    const { _id: recipeId, id, title, description, vegetarian, dates} = recipe;
-    
-    const updatedDays = [...days];    
+    const { _id: recipeId, id, title, description, vegetarian, dates } = recipe;
+
+    const updatedDays = [...days];
     const oldDay = updatedDays.find(({ date }) => date === srcDate);
     oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
     setDays(updatedDays);
@@ -233,14 +236,14 @@ function Planning(props) {
       }
     };
     axios(options)
-    .then(function(response) {
-      console.log(response);
-    })
-    .catch(function(error) {
-      console.log(error);
-      refresh();
-    });
-  }
+      .then(function(response) {
+        console.log(response);
+      })
+      .catch(function(error) {
+        console.log(error);
+        refresh();
+      });
+  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -309,7 +312,9 @@ function Planning(props) {
                                             classes={{
                                               sizeSmall: classes.rmvBtnSize
                                             }}
-                                            onClick={() => onRemove(recipe, date)}
+                                            onClick={() =>
+                                              onRemove(recipe, date)
+                                            }
                                           >
                                             <ClearIcon
                                               className={classes.rmvIcon}

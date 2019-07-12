@@ -7,60 +7,79 @@ import {
   Typography,
   IconButton,
   LinearProgress,
-  Button
+  Button,
+  Toolbar
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
+import Menu from "../Menu";
 
-const useStyles = makeStyles({
+const drawerWidth = 240;
+const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1
+    display: "flex"
+  },
+  drawer: {
+    [theme.breakpoints.up("sm")]: {
+      width: drawerWidth,
+      flexShrink: 0
+    }
   },
   appBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    minHeight: "50px"
+    marginLeft: drawerWidth,
+    [theme.breakpoints.up("sm")]: {
+      width: `calc(100% - ${drawerWidth}px)`
+    }
   },
-  title: {
-    flexGrow: 1
-    // marginLeft: "20px"
+  menuButton: {
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      display: "none"
+    }
+  },
+  toolbar: theme.mixins.toolbar,
+  drawerPaper: {
+    width: drawerWidth
   }
-});
+}));
 
 function HeaderBar({ loading }) {
   const classes = useStyles();
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  React.useEffect(() => {
+
+  }, [])
   return (
     <Location>
       {({ location }) => (
-        <div className={classes.root}>
+        <React.Fragment>
           <AppBar position="fixed" className={classes.appBar}>
-            <IconButton component={Link} to="/">
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              variant="h6"
-              component="h1"
-              noWrap
-              className={classes.title}
-            >
-              Mes Recettes
-            </Typography>
-            <Button
-              href="https://shoppinglist.google.com"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Shopping List
-            </Button>
-            <Button component={Link} to="/planning">
-              Planning
-            </Button>
-            {location.pathname !== "/new" && (
-              <Button component={Link} to="/new">Nouveau</Button>
-            )}
-            <div />
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="Open drawer"
+                edge="start"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className={classes.menuButton}
+              >
+                <MenuIcon />
+              </IconButton>
+
+              <Typography
+                variant="h6"
+                component="h1"
+                noWrap
+              >
+                Mes Recettes
+              </Typography>
+            </Toolbar>
+            {loading && <LinearProgress color="secondary" />}
           </AppBar>
-          {loading && <LinearProgress color="secondary" />}
-        </div>
+          <Menu
+            mobileOpen={mobileOpen}
+            setMobileOpen={setMobileOpen}
+            classes={classes}
+          />
+        </React.Fragment>
       )}
     </Location>
   );

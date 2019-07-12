@@ -9,28 +9,33 @@ import HeaderBar from "./HeaderBar";
 import { Box } from "@material-ui/core";
 import Planning from "./Planning";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
+  root: {
+    display: 'flex',
+  },
   box: {
     position: "relative",
-    top: "50px"
+    top: "50px",
+    flexGrow: 1,
+    padding: theme.spacing(3)
   }
-});
+}));
 
 export default function App() {
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
   return (
-    <>
+    <div className={classes.root}>
       <CssBaseline />
       <HeaderBar loading={loading} />
       <Box className={classes.box}>
         <Router>
           <List path="/" setLoading={setLoading} />
-          <Planning path="/planning"/>
+          <Planning path="/planning" setLoading={setLoading}/>
           {/* <NewRecipe path="/new" /> */}
           <Recipe path="/:id" setLoading={setLoading} />
         </Router>
       </Box>
-    </>
+    </div>
   );
 }
