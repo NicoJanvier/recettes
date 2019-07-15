@@ -47,10 +47,18 @@ const useStyles = makeStyles({
     zIndex: 1
   },
   gridRow: {
-    borderRadius: "8px"
+    borderRadius: "8px",
+    width: "100%",
   },
   gridRowEditing: {
     border: "2px dashed lightgrey"
+  },
+  gridItemDate: {
+    
+  },
+  dateText: {
+    display: "inline-block",
+    paddingRight: "8px",
   },
   addBtnCard: {
     order: 1,
@@ -61,7 +69,8 @@ const useStyles = makeStyles({
     position: "sticky",
     width: "fit-content",
     bottom: "0px",
-    padding: "20px",
+    marginLeft: "auto",
+    paddingBottom: "20px",
     display: "flex",
     flexFlow: "column-reverse",
     alignItems: "center"
@@ -71,6 +80,8 @@ const useStyles = makeStyles({
   },
   // Remove Button
   recipeCard: {
+    width: "100%",
+    marginBottom: "16px",
     position: "relative",
     "&:hover": {
       "& .MuiCard-root": {
@@ -249,16 +260,16 @@ function Planning({ setLoading }) {
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
         {isError && "ERROR"}
-        <Grid container item spacing={4} xs={12} className={classes.leftPanel}>
+        <Grid container spacing={4}>
           {days.map(({ date, recipes }) => {
             return (
               <React.Fragment key={date}>
                 {isToday(date) && <div ref={todayRef} />}
                 {(recipes.length > 0 || editing) && (
-                  <Grid item container xs={12} id={date}>
-                    <Grid item xs={2} className={classes.gridItemDate}>
-                      <Typography>{formatToDay(date)}</Typography>
-                      <Typography>{formatToDayOfWeek(date)}</Typography>
+                  <Grid item container spacing={2} id={date} direction="row">
+                    <Grid item className={classes.gridItemDate}>
+                      <Typography className={classes.dateText}>{formatToDayOfWeek(date)}</Typography>
+                      <Typography className={classes.dateText}>{formatToDay(date)}</Typography>
                     </Grid>
                     <Droppable droppableId={date}>
                       {provided => (
@@ -266,8 +277,7 @@ function Planning({ setLoading }) {
                           <Grid
                             item
                             container
-                            xs={10}
-                            spacing={2}
+                            // spacing={2}
                             className={`${classes.gridRow} 
                               ${editing ? classes.gridRowEditing : ""}`}
                           >
@@ -284,7 +294,6 @@ function Planning({ setLoading }) {
                                     <RootRef rootRef={provided.innerRef}>
                                       <Grid
                                         item
-                                        xs={12}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
                                         style={getItemStyle(
@@ -353,6 +362,7 @@ function Planning({ setLoading }) {
             color="primary"
             className={classes.fab}
             onClick={() => setEditing(!editing)}
+            size="medium"
           >
             <AddIcon />
           </Fab>
