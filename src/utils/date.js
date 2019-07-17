@@ -45,7 +45,8 @@ const formatToDay = date => {
 };
 const formatToDayOfWeek = date => {
   moment.locale("fr");
-  return dateFormat(date, "dddd");
+  const toDay =  dateFormat(date, "dddd");
+  return toDay.charAt(0).toUpperCase() + toDay.slice(1);
 };
 
 const addDays = (date, offset) =>

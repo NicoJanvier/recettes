@@ -79,7 +79,7 @@ export default function List({ setLoading = () => {}, onPick }) {
   const [search, setSearch] = React.useState("");
   const [recipes, setRecipes] = React.useState([]);
   const [vegFilter, setVegFilter] = React.useState(false);
-  const [sortDate, setSortDate] = React.useState(false);
+  const [sortDate, setSortDate] = React.useState(true);
 
   React.useEffect(() => {
     if (data && data.data) {
