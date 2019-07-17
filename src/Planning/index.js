@@ -1,19 +1,14 @@
 import React from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import axios from "axios";
 import {
   Grid,
   Container,
   Typography,
-  AppBar,
-  FormControlLabel,
-  Switch,
   IconButton,
   Button,
   Fab,
-  Drawer,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions
 } from "@material-ui/core";
@@ -88,15 +83,6 @@ const useStyles = makeStyles({
   dialogDividers: {
     borderTop: "none"
   },
-  // dialogFab: {
-  //   position: "sticky",
-  //   width: "fit-content",
-  //   bottom: "0px",
-  //   marginLeft: "auto",
-  //   paddingBottom: "20px",
-  //   paddingRight: "20px"
-  // },
-  // Remove Button
   recipeCard: {
     width: "100%",
     marginBottom: "16px",
@@ -109,9 +95,6 @@ const useStyles = makeStyles({
         width: "25px",
         height: "25px",
         transform: "scale(1)"
-        // "& svg": {
-        //   display: "block",
-        // }
       }
     }
   },
@@ -379,7 +362,6 @@ function Planning({ setLoading }) {
           scroll="paper"
           aria-labelledby="responsive-dialog-title"
         >
-          {/* <DialogTitle id="max-width-dialog-title">Optional sizes</DialogTitle> */}
           <DialogContent
             dividers
             classes={{
@@ -394,14 +376,6 @@ function Planning({ setLoading }) {
               Close
             </Button>
           </DialogActions>
-          {/* <div className={classes.dialogFab}>
-            <Fab
-              onClick={() => setDialogOpen(false)}
-              color="secondary"
-            >
-              <ClearIcon />
-            </Fab>
-          </div> */}
         </Dialog>
       </Container>
       {!isLoading && !isError && (

@@ -4,8 +4,6 @@ import {
   Grid,
   Container,
   InputBase,
-  Box,
-  Paper,
   AppBar,
   Divider,
   Avatar,
