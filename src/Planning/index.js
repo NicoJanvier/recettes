@@ -22,7 +22,6 @@ import ClearIcon from "@material-ui/icons/Clear";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
-import useDataApi from "../hooks/useDataApi";
 import {
   compareDateProperty,
   formatToDay,
@@ -34,6 +33,7 @@ import {
 import RecipeCard from "../RecipeCard";
 import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
+import { useRecipesState } from "../contexts/recipes";
 
 const API_PATH = "/api";
 
@@ -75,10 +75,10 @@ const useStyles = makeStyles({
     marginTop: "16px"
   },
   dialog: {
-    height: "100%",
+    height: "100%"
   },
   dialogContent: {
-    padding: 0,
+    padding: 0
   },
   dialogDividers: {
     borderTop: "none"
@@ -116,19 +116,15 @@ const useStyles = makeStyles({
   }
 });
 
-function Planning({ setLoading }) {
+function Planning() {
   const classes = useStyles();
-  const url = { url: `${API_PATH}/recipes`, method: "get" };
-  const [{ isLoading, isError, data }, setUrl] = useDataApi(url, []);
-  React.useEffect(() => {
-    setLoading(isLoading);
-  }, [isLoading, setLoading]);
-  const refresh = () => setUrl(url);
+  const { recipes, isLoading, isError, refresh } = useRecipesState();
+
   const [days, setDays] = React.useState([]);
 
   React.useEffect(() => {
-    if (data && data.data) {
-      const allRecipes = data.data;
+    if (recipes.length !== 0) {
+      const allRecipes = recipes;
       const allDays = allRecipes
         .map(recipe => recipe.dates.map(date => ({ date, recipe })))
         .flat()
@@ -154,7 +150,7 @@ function Planning({ setLoading }) {
 
       setDays([...mergedDays, ...emptyDays]);
     }
-  }, [data]);
+  }, [recipes]);
 
   const [editing, setEditing] = React.useState(false);
 
@@ -174,7 +170,7 @@ function Planning({ setLoading }) {
     const recipeId = result.draggableId.split("_")[0];
 
     if (newDate !== oldDate) {
-      const recipe = data.data.find(({ _id }) => _id === recipeId);
+      const recipe = recipes.find(({ _id }) => _id === recipeId);
 
       const updatedDays = [...days];
       const oldDay = updatedDays.find(({ date }) => date === oldDate);
@@ -230,13 +226,9 @@ function Planning({ setLoading }) {
       }
     };
     axios(options)
-      .then(function(response) {
-        console.log(response);
-      })
-      .catch(function(error) {
-        console.log(error);
-        refresh();
-      });
+      .then(r => console.log(r))
+      .catch(e => console.log(e))
+      .finally(() => refresh())
   };
 
   const [pickDate, setPickDate] = React.useState(null);
@@ -355,7 +347,7 @@ function Planning({ setLoading }) {
         <Dialog
           open={isDialogOpen}
           onClose={() => setDialogOpen(false)}
-          classes={{paper: classes.dialog}}
+          classes={{ paper: classes.dialog }}
           fullScreen={fullScreen}
           maxWidth="sm"
           fullWidth

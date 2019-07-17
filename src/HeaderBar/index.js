@@ -1,17 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Location, Link } from "@reach/router";
+import { Location } from "@reach/router";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Typography,
   IconButton,
   LinearProgress,
-  Button,
   Toolbar
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import Menu from "../Menu";
+import { useRecipesState } from "../contexts/recipes";
 
 const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
@@ -42,12 +42,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function HeaderBar({ loading }) {
+function HeaderBar() {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  React.useEffect(() => {
-
-  }, [])
+  const { isLoading } = useRecipesState();
   return (
     <Location>
       {({ location }) => (
@@ -64,15 +62,11 @@ function HeaderBar({ loading }) {
                 <MenuIcon />
               </IconButton>
 
-              <Typography
-                variant="h6"
-                component="h1"
-                noWrap
-              >
+              <Typography variant="h6" component="h1" noWrap>
                 Mes Recettes
               </Typography>
             </Toolbar>
-            {loading && <LinearProgress color="secondary" />}
+            {isLoading && <LinearProgress color="secondary" />}
           </AppBar>
           <Menu
             mobileOpen={mobileOpen}

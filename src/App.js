@@ -2,6 +2,9 @@ import React from "react";
 import { Router } from "@reach/router";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from "@material-ui/core/styles";
+
+import { RecipesProvider } from "./contexts/recipes";
+
 import Recipe from "./Recipe/index";
 // import NewRecipe from "./NewRecipe";
 import List from "./List";
@@ -11,7 +14,7 @@ import Planning from "./Planning";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    display: 'flex',
+    display: "flex"
   },
   box: {
     position: "relative",
@@ -23,19 +26,20 @@ const useStyles = makeStyles(theme => ({
 
 export default function App() {
   const classes = useStyles();
-  const [loading, setLoading] = React.useState(false);
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <HeaderBar loading={loading} />
-      <Box className={classes.box}>
-        <Router>
-          <List path="/" setLoading={setLoading} />
-          <Planning path="/planning" setLoading={setLoading}/>
-          {/* <NewRecipe path="/new" /> */}
-          <Recipe path="/:id" setLoading={setLoading} />
-        </Router>
-      </Box>
-    </div>
+    <RecipesProvider>
+      <div className={classes.root}>
+        <CssBaseline />
+        <HeaderBar/>
+        <Box className={classes.box}>
+          <Router>
+            <List path="/"/>
+            <Planning path="/planning"/>
+            {/* <NewRecipe path="/new" /> */}
+            <Recipe path="/:id"/>
+          </Router>
+        </Box>
+      </div>
+    </RecipesProvider>
   );
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import useDataApi from "../hooks/useDataApi";
 import {
   Grid,
   Container,
@@ -15,11 +14,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import ClearIcon from "@material-ui/icons/Clear";
 import SortIcon from "@material-ui/icons/Sort";
 
-
 import RecipeCard from "../RecipeCard";
 import { compareLastDate } from "../utils/date";
-
-const API_PATH = "/api";
+import { useRecipesState } from "../contexts/recipes";
 
 const useStyles = makeStyles({
   search: {
@@ -63,52 +60,43 @@ const useStyles = makeStyles({
   sortDateOff: {}
 });
 
-export default function List({ setLoading = () => {}, onPick }) {
+export default function List({ onPick }) {
   const classes = useStyles();
-  const [{ isLoading, isError, data }] = useDataApi(
-    { url: `${API_PATH}/recipes`, method: "get" },
-    []
-  );
-
-  React.useEffect(() => {
-    setLoading(isLoading);
-  }, [isLoading, setLoading]);
+  const { recipes, isError } = useRecipesState();
 
   const [search, setSearch] = React.useState("");
-  const [recipes, setRecipes] = React.useState([]);
+  const [listRecipes, setListRecipes] = React.useState(recipes);
   const [vegFilter, setVegFilter] = React.useState(false);
   const [sortDate, setSortDate] = React.useState(true);
 
   React.useEffect(() => {
-    if (data && data.data) {
-      const allRecipes = data.data;
-      const lowSearch = search.toLowerCase();
-      const searchedRecipes = allRecipes
-        .filter(recipe => {
-          const lowTitle = recipe.title.toLowerCase();
-          return lowTitle.includes(lowSearch) && recipe;
-        })
-        .filter(recipe => {
-          if (vegFilter) {
-            return recipe.vegetarian;
-          }
-          return true;
-        })
-        .sort((a, b) => {
-          if (sortDate) {
-            return compareLastDate(a.dates, b.dates);
-          } else if (search) {
-            return (
-              a.title.toLowerCase().indexOf(lowSearch) -
-              b.title.toLowerCase().indexOf(lowSearch)
-            );
-          } else {
-            return a.title.localeCompare(b.title);
-          }
-        });
-      setRecipes(searchedRecipes);
-    }
-  }, [data, search, sortDate, vegFilter]);
+    const allRecipes = recipes;
+    const lowSearch = search.toLowerCase();
+    const searchedRecipes = allRecipes
+      .filter(recipe => {
+        const lowTitle = recipe.title.toLowerCase();
+        return lowTitle.includes(lowSearch) && recipe;
+      })
+      .filter(recipe => {
+        if (vegFilter) {
+          return recipe.vegetarian;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortDate) {
+          return compareLastDate(a.dates, b.dates);
+        } else if (search) {
+          return (
+            a.title.toLowerCase().indexOf(lowSearch) -
+            b.title.toLowerCase().indexOf(lowSearch)
+          );
+        } else {
+          return a.title.localeCompare(b.title);
+        }
+      });
+    setListRecipes(searchedRecipes);
+  }, [recipes, search, sortDate, vegFilter]);
 
   return (
     <>
@@ -157,9 +145,9 @@ export default function List({ setLoading = () => {}, onPick }) {
       <Container>
         {isError && "ERROR"}
         <Grid container spacing={2} className={classes.gridContainer}>
-          {recipes.map(recipe => (
+          {listRecipes.map(recipe => (
             <Grid item xs={12} key={recipe._id}>
-              <RecipeCard data={recipe} onPick={onPick}/>
+              <RecipeCard data={recipe} onPick={onPick} />
             </Grid>
           ))}
         </Grid>
