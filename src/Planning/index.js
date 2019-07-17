@@ -12,7 +12,10 @@ import {
   Button,
   Fab,
   Drawer,
-  Dialog
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@material-ui/core";
 import RootRef from "@material-ui/core/RootRef";
 import { makeStyles } from "@material-ui/styles";
@@ -48,17 +51,15 @@ const useStyles = makeStyles({
   },
   gridRow: {
     borderRadius: "8px",
-    width: "100%",
+    width: "100%"
   },
   gridRowEditing: {
     border: "2px dashed lightgrey"
   },
-  gridItemDate: {
-    
-  },
+  gridItemDate: {},
   dateText: {
     display: "inline-block",
-    paddingRight: "8px",
+    paddingRight: "8px"
   },
   addBtnCard: {
     order: 1,
@@ -78,6 +79,23 @@ const useStyles = makeStyles({
   fab: {
     marginTop: "16px"
   },
+  dialog: {
+    height: "100%",
+  },
+  dialogContent: {
+    padding: 0,
+  },
+  dialogDividers: {
+    borderTop: "none"
+  },
+  // dialogFab: {
+  //   position: "sticky",
+  //   width: "fit-content",
+  //   bottom: "0px",
+  //   marginLeft: "auto",
+  //   paddingBottom: "20px",
+  //   paddingRight: "20px"
+  // },
   // Remove Button
   recipeCard: {
     width: "100%",
@@ -268,8 +286,12 @@ function Planning({ setLoading }) {
                 {(recipes.length > 0 || editing) && (
                   <Grid item container spacing={2} id={date} direction="row">
                     <Grid item className={classes.gridItemDate}>
-                      <Typography className={classes.dateText}>{formatToDayOfWeek(date)}</Typography>
-                      <Typography className={classes.dateText}>{formatToDay(date)}</Typography>
+                      <Typography className={classes.dateText}>
+                        {formatToDayOfWeek(date)}
+                      </Typography>
+                      <Typography className={classes.dateText}>
+                        {formatToDay(date)}
+                      </Typography>
                     </Grid>
                     <Droppable droppableId={date}>
                       {provided => (
@@ -350,10 +372,36 @@ function Planning({ setLoading }) {
         <Dialog
           open={isDialogOpen}
           onClose={() => setDialogOpen(false)}
+          classes={{paper: classes.dialog}}
           fullScreen={fullScreen}
+          maxWidth="sm"
+          fullWidth
+          scroll="paper"
           aria-labelledby="responsive-dialog-title"
         >
-          <List onPick={onPick} />
+          {/* <DialogTitle id="max-width-dialog-title">Optional sizes</DialogTitle> */}
+          <DialogContent
+            dividers
+            classes={{
+              root: classes.dialogContent,
+              dividers: classes.dialogDividers
+            }}
+          >
+            <List onPick={onPick} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+          {/* <div className={classes.dialogFab}>
+            <Fab
+              onClick={() => setDialogOpen(false)}
+              color="secondary"
+            >
+              <ClearIcon />
+            </Fab>
+          </div> */}
         </Dialog>
       </Container>
       {!isLoading && !isError && (
