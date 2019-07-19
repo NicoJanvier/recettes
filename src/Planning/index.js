@@ -13,7 +13,6 @@ import {
   DialogActions
 } from "@material-ui/core";
 import RootRef from "@material-ui/core/RootRef";
-import { makeStyles } from "@material-ui/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
@@ -22,135 +21,18 @@ import ClearIcon from "@material-ui/icons/Clear";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
-import {
-  compareDateProperty,
-  formatToDay,
-  formatToDayOfWeek,
-  addDays,
-  generateDateList,
-  isToday
-} from "../utils/date";
+import { formatToDay, formatToDayOfWeek, isToday } from "../utils/date";
 import RecipeCard from "../RecipeCard";
 import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
 import { useRecipesState } from "../contexts/recipes";
-
-const API_PATH = "/api";
-
-const useStyles = makeStyles({
-  appBar: {
-    position: "sticky",
-    background: "white",
-    top: "50px",
-    zIndex: 1
-  },
-  gridRow: {
-    borderRadius: "8px",
-    width: "100%"
-  },
-  gridRowEditing: {
-    border: "2px dashed lightgrey"
-  },
-  gridItemDate: {},
-  dateText: {
-    display: "inline-block",
-    paddingRight: "8px"
-  },
-  addBtnCard: {
-    order: 1,
-    display: "flex",
-    justifyContent: "flex-end"
-  },
-  fabBox: {
-    position: "sticky",
-    width: "fit-content",
-    bottom: "0px",
-    marginLeft: "auto",
-    paddingBottom: "20px",
-    display: "flex",
-    flexFlow: "column-reverse",
-    alignItems: "center"
-  },
-  fab: {
-    marginTop: "16px"
-  },
-  dialog: {
-    height: "100%"
-  },
-  dialogContent: {
-    padding: 0
-  },
-  dialogDividers: {
-    borderTop: "none"
-  },
-  recipeCard: {
-    width: "100%",
-    marginBottom: "16px",
-    position: "relative",
-    "&:hover": {
-      "& .MuiCard-root": {
-        backgroundColor: "rgba(0, 0, 0, 0.01)"
-      },
-      "& button": {
-        width: "25px",
-        height: "25px",
-        transform: "scale(1)"
-      }
-    }
-  },
-  rmvBtn: {
-    position: "absolute",
-    top: "4px",
-    right: "4px",
-    minHeight: "0px"
-  },
-  rmvBtnSize: {
-    width: "25px",
-    height: "25px",
-    transform: "scale(0)",
-    transition: "all 0.5s"
-  },
-  rmvIcon: {
-    width: "0.8em",
-    height: "0.8em"
-  }
-});
+import { useStyles } from "./styles";
+import { useDaysList } from "./hooks/useDaysList";
 
 function Planning() {
   const classes = useStyles();
   const { recipes, isLoading, isError, refresh } = useRecipesState();
-
-  const [days, setDays] = React.useState([]);
-
-  React.useEffect(() => {
-    if (recipes.length !== 0) {
-      const allRecipes = recipes;
-      const allDays = allRecipes
-        .map(recipe => recipe.dates.map(date => ({ date, recipe })))
-        .flat()
-        .sort(compareDateProperty);
-      const fullDaysList = generateDateList(
-        allDays[0].date,
-        allDays[allDays.length - 1].date
-      );
-
-      const mergedDays = fullDaysList.map(date => ({
-        date,
-        recipes: allDays
-          .filter(({ date: day }) => day === date)
-          .map(({ recipe }) => recipe)
-      }));
-
-      const lastDate = mergedDays[mergedDays.length - 1].date;
-      const emptyDays = [];
-      for (let offset = 1; offset <= 7; offset++) {
-        const newDay = { date: addDays(lastDate, offset), recipes: [] };
-        emptyDays.push(newDay);
-      }
-
-      setDays([...mergedDays, ...emptyDays]);
-    }
-  }, [recipes]);
+  const [days, setDays] = useDaysList(recipes);
 
   const [editing, setEditing] = React.useState(false);
 
@@ -189,15 +71,6 @@ function Planning() {
     }
   };
 
-  const getItemStyle = (isDragging, draggableStyle) => ({
-    // styles we need to apply on draggables
-    ...draggableStyle
-
-    // ...(isDragging && {
-    //   background: "rgb(235,235,235)"
-    // })
-  });
-
   const onRemove = (recipe, srcDate) => {
     const { _id: recipeId, dates } = recipe;
 
@@ -210,12 +83,10 @@ function Planning() {
     updateRecipeDates(recipe, newDates);
   };
 
-  const [isDialogOpen, setDialogOpen] = React.useState(false);
-
   const updateRecipeDates = async (recipe, dates) => {
     const { _id: strictId, id, title, description, vegetarian } = recipe;
     const options = {
-      url: `${API_PATH}/recipes/${strictId}`,
+      url: `/api/recipes/${strictId}`,
       method: "put",
       data: {
         id,
@@ -228,9 +99,10 @@ function Planning() {
     axios(options)
       .then(r => console.log(r))
       .catch(e => console.log(e))
-      .finally(() => refresh())
+      .finally(() => refresh());
   };
 
+  const [isDialogOpen, setDialogOpen] = React.useState(false);
   const [pickDate, setPickDate] = React.useState(null);
   const onClickPick = date => {
     setPickDate(date);
@@ -274,7 +146,6 @@ function Planning() {
                           <Grid
                             item
                             container
-                            // spacing={2}
                             className={`${classes.gridRow} 
                               ${editing ? classes.gridRowEditing : ""}`}
                           >
@@ -287,20 +158,17 @@ function Planning() {
                                   draggableId={id}
                                   isDragDisabled={!editing}
                                 >
-                                  {(provided, snapshot) => (
+                                  {provided => (
                                     <RootRef rootRef={provided.innerRef}>
                                       <Grid
                                         item
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
-                                        style={getItemStyle(
-                                          snapshot.isDragging,
-                                          provided.draggableProps.style
-                                        )}
+                                        style={provided.draggableProps.style}
                                         className={classes.recipeCard}
                                       >
                                         <RecipeCard
-                                          data={recipe}
+                                          recipe={recipe}
                                           noDate
                                           selected={isToday(date)}
                                         />

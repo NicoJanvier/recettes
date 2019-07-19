@@ -8,8 +8,6 @@ import {
   Avatar,
   IconButton
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import { green } from "@material-ui/core/colors";
 import SearchIcon from "@material-ui/icons/Search";
 import ClearIcon from "@material-ui/icons/Clear";
 import SortIcon from "@material-ui/icons/Sort";
@@ -17,55 +15,14 @@ import SortIcon from "@material-ui/icons/Sort";
 import RecipeCard from "../RecipeCard";
 import { compareLastDate } from "../utils/date";
 import { useRecipesState } from "../contexts/recipes";
-
-const useStyles = makeStyles({
-  search: {
-    padding: "8px 16px"
-  },
-  searchBar: {
-    position: "sticky",
-    background: "white",
-    // top: "50px",
-    zIndex: 1
-  },
-  gridContainer: {
-    marginTop: "16px"
-  },
-  divider: {
-    width: 1,
-    height: 28,
-    margin: 4
-  },
-  searchIcon: {
-    color: "lightgrey",
-    marginRight: "6px"
-  },
-  vegOff: {
-    height: "25px",
-    width: "25px",
-    fontSize: "12px",
-    color: "white",
-    backgroundColor: green[500]
-  },
-  vegOn: {
-    height: "25px",
-    width: "25px",
-    fontSize: "12px",
-    color: "white",
-    backgroundColor: green[800]
-  },
-  sortDateOn: {
-    color: "black"
-  },
-  sortDateOff: {}
-});
+import { useStyles } from "./styles";
 
 export default function List({ onPick }) {
   const classes = useStyles();
   const { recipes, isError } = useRecipesState();
+  const [listRecipes, setListRecipes] = React.useState(recipes);
 
   const [search, setSearch] = React.useState("");
-  const [listRecipes, setListRecipes] = React.useState(recipes);
   const [vegFilter, setVegFilter] = React.useState(false);
   const [sortDate, setSortDate] = React.useState(true);
 
@@ -147,7 +104,7 @@ export default function List({ onPick }) {
         <Grid container spacing={2} className={classes.gridContainer}>
           {listRecipes.map(recipe => (
             <Grid item xs={12} key={recipe._id}>
-              <RecipeCard data={recipe} onPick={onPick} />
+              <RecipeCard recipe={recipe} onPick={onPick} />
             </Grid>
           ))}
         </Grid>

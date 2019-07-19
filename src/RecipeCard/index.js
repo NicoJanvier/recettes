@@ -10,34 +10,14 @@ import {
   IconButton,
   Avatar
 } from "@material-ui/core";
-import { green } from "@material-ui/core/colors";
-import { makeStyles } from "@material-ui/styles";
-
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
 import { getLastDateFromNow } from "../utils/date";
+import { useStyles } from "./styles";
 
-const useStyles = makeStyles({
-  cardAction: {
-    justifyContent: "flex-end"
-  },
-  avatar: {
-    color: "white",
-    backgroundColor: green[500],
-    width: "25px",
-    height: "25px",
-    fontSize: "12px",
-    marginRight: "auto",
-    marginLeft: "6px"
-  },
-  selectedCard: {
-    backgroundColor: green[100],
-  },
-});
-
-function RecipeCard({ data, noDate = false, selected = false, onPick}) {
+function RecipeCard({ recipe, noDate = false, selected = false, onPick}) {
   const classes = useStyles();
-  const { title, _id, url, vegetarian: veg, dates } = data;
+  const { title, _id, url, vegetarian: veg, dates } = recipe;
   const lastDate = getLastDateFromNow(dates);
   return (
     <Card className={selected ? classes.selectedCard : ""}>
@@ -65,14 +45,14 @@ function RecipeCard({ data, noDate = false, selected = false, onPick}) {
         <Button component={RouterLink} to={`/${_id}`}>
           PLUS
         </Button>
-        {!!onPick && <Button onClick={() => onPick(data)}>AJOUTER</Button>}
+        {!!onPick && <Button onClick={() => onPick(recipe)}>AJOUTER</Button>}
       </CardActions>
     </Card>
   );
 }
 
 RecipeCard.propTypes = {
-  data: PropTypes.shape({
+  recipe: PropTypes.shape({
     title: PropTypes.string.isRequired
   }).isRequired
 };
