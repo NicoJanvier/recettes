@@ -41,27 +41,23 @@ function Planning() {
   const executeScroll = (smooth = true) => scrollToRef(todayRef, smooth);
   const topRef = React.useRef(null);
   const [topRefDate, setTopRefDate] = React.useState(null);
-  const onPreviousClick = () => {
+  function onPreviousClick(){
     setTopRefDate(days[0].date);
     addDays();
   };
-  React.useEffect(() => {
-    if(days.length && !topRefDate) {
-      setTopRefDate(days[0].date);
-    }
-    topRef.current && scrollToRef(topRef, false);
-  }, [days, topRefDate]);
+
+  React.useEffect(() => scrollToRef(topRef, false), [topRefDate, days]);
 
   // Draggable
   const onDragEnd = result => {
-    console.log(result);
     if (!result.destination) {
       return;
     }
-    const newDate = result.destination.droppableId;
-    const newIndex = result.destination.index;
-    const oldDate = result.source.droppableId;
-    const recipeId = result.draggableId.split("_")[0];
+    const {source, destination, draggableId} = result;
+    const newDate = destination.droppableId;
+    const newIndex = destination.index;
+    const oldDate = source.droppableId;
+    const recipeId = draggableId.split("_")[0];
 
     if (newDate !== oldDate) {
       const recipe = recipes.find(({ _id }) => _id === recipeId);
@@ -138,8 +134,8 @@ function Planning() {
       <Container>
         {isError && "ERROR"}
         <Grid container spacing={4} direction="column">
-          <Button onClick={onPreviousClick}>Précédent jours</Button>
-          {days.map(({ date, recipes }, dayIndex) => {
+          <Button onClick={() => onPreviousClick()}>Précédent jours</Button>
+          {days.map(({ date, recipes }) => {
             return (
               <React.Fragment key={date}>
                 {isToday(date) && <div ref={todayRef} />}

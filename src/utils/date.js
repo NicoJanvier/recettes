@@ -56,17 +56,6 @@ const addDays = (date, offset) =>
 
 const isToday = date => moment(date).isSame(moment(), "day");
 
-const generateDateList = (start, end) => {
-  const startM = moment(start);
-  const endM = moment(end);
-  const days = [];
-  let day = startM;
-  while (day.isSameOrBefore(endM)) {
-    days.push(day.format("YYYY-MM-DD"));
-    day = day.clone().add(1, "d");
-  }
-  return days;
-};
 
 
 export {
@@ -78,5 +67,4 @@ export {
   formatToDayOfWeek,
   addDays,
   isToday,
-  generateDateList
 };
