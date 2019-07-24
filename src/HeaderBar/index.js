@@ -79,8 +79,8 @@ function HeaderBar() {
   );
 }
 
-HeaderBar.propTypes = {
-  loading: PropTypes.bool.isRequired
-};
+// HeaderBar.propTypes = {
+//   loading: PropTypes.bool.isRequired
+// };
 
 export default HeaderBar;

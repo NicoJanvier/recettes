@@ -67,6 +67,7 @@ export default function List({ onPick }) {
           <InputBase
             className={classes.search}
             placeholder="Rechercher..."
+            autoFocus
             fullWidth={true}
             value={search}
             onChange={({ target: { value } }) => setSearch(value)}

@@ -1,42 +1,33 @@
 import React from "react";
+import moment from "moment";
 import {
   compareDateProperty,
   generateDateList,
-  addDays
 } from "../../utils/date";
 
 function useDaysList(recipes = []) {
   const [days, setDays] = React.useState([]);
+  const [offset, setOffset] = React.useState(0);
+  const addDays = () => setOffset(off => off - 10);
   React.useEffect(() => {
-    if (recipes.length !== 0) {
-      const allRecipes = recipes;
-      const allDays = allRecipes
-        .map(recipe => recipe.dates.map(date => ({ date, recipe })))
-        .flat()
-        .sort(compareDateProperty);
-      const fullDaysList = generateDateList(
-        allDays[0].date,
-        allDays[allDays.length - 1].date
-      );
+    const daysList = generateDateList(
+      moment().add(offset, "d"),
+      moment().add(10, "d")
+    );
+    const allDays = recipes
+      .map(recipe => recipe.dates.map(date => ({ date, recipe })))
+      .flat()
+      .sort(compareDateProperty);
+    const mergedDays = daysList.map(date => ({
+      date,
+      recipes: allDays
+        .filter(({ date: day }) => day === date)
+        .map(({ recipe }) => recipe)
+    }));
+    setDays(mergedDays);
+  }, [recipes, offset]);
 
-      const mergedDays = fullDaysList.map(date => ({
-        date,
-        recipes: allDays
-          .filter(({ date: day }) => day === date)
-          .map(({ recipe }) => recipe)
-      }));
-
-      const lastDate = mergedDays[mergedDays.length - 1].date;
-      const emptyDays = [];
-      for (let offset = 1; offset <= 7; offset++) {
-        const newDay = { date: addDays(lastDate, offset), recipes: [] };
-        emptyDays.push(newDay);
-      }
-
-      setDays([...mergedDays, ...emptyDays]);
-    }
-  }, [recipes]);
-  return [days, setDays];
+  return [days, setDays, addDays];
 }
 
 export { useDaysList };
