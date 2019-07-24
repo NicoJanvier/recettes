@@ -32,13 +32,25 @@ import { useDaysList } from "./hooks/useDaysList";
 function Planning() {
   const classes = useStyles();
   const { recipes, isLoading, isError, refresh } = useRecipesState();
-  const [days, setDays] = useDaysList(recipes);
+  const [days, setDays, addDays] = useDaysList(recipes);
 
-  const [editing, setEditing] = React.useState(false);
+  const [editing, setEditing] = React.useState(true);
 
   // Scrolling
   const todayRef = React.useRef(null);
-  const executeScroll = () => scrollToRef(todayRef);
+  const executeScroll = (smooth = true) => scrollToRef(todayRef, smooth);
+  const topRef = React.useRef(null);
+  const [topRefDate, setTopRefDate] = React.useState(null);
+  const onPreviousClick = () => {
+    setTopRefDate(days[0].date);
+    addDays();
+  };
+  React.useEffect(() => {
+    if(days.length && !topRefDate) {
+      setTopRefDate(days[0].date);
+    }
+    topRef.current && scrollToRef(topRef, false);
+  }, [days, topRefDate]);
 
   // Draggable
   const onDragEnd = result => {
@@ -125,13 +137,20 @@ function Planning() {
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
         {isError && "ERROR"}
-        <Grid container spacing={4}>
-          {days.map(({ date, recipes }) => {
+        <Grid container spacing={4} direction="column">
+          <Button onClick={onPreviousClick}>Précédent jours</Button>
+          {days.map(({ date, recipes }, dayIndex) => {
             return (
               <React.Fragment key={date}>
                 {isToday(date) && <div ref={todayRef} />}
                 {(recipes.length > 0 || editing) && (
-                  <Grid item container spacing={2} id={date} direction="row">
+                  <Grid
+                    item
+                    container
+                    spacing={2}
+                    id={date}
+                    ref={topRefDate === date ? topRef : null}
+                  >
                     <Grid item className={classes.gridItemDate}>
                       <Typography className={classes.dateText}>
                         {formatToDayOfWeek(date)}
