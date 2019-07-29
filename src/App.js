@@ -33,8 +33,8 @@ export default function App() {
         <HeaderBar/>
         <Box className={classes.box}>
           <Router>
-            <List path="/"/>
-            <Planning path="/planning"/>
+            <Planning path="/"/>
+            <List path="/list"/>
             {/* <NewRecipe path="/new" /> */}
             <Recipe path="/:id"/>
           </Router>

@@ -21,14 +21,14 @@ const DrawerContent = ({ classes, onNavigate }) => {
   const navItems = [
     [
       {
-        label: "List",
-        icon: ListIcon,
+        label: "Planning",
+        icon: DateRangeIcon,
         onClick: () => onClick('/'), 
       },
       {
-        label: "Planning",
-        icon: DateRangeIcon,
-        onClick: () => onClick('/planning'), 
+        label: "List",
+        icon: ListIcon,
+        onClick: () => onClick('/list'), 
       },
       {
         label: "Nouveau",
