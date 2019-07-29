@@ -1,6 +1,5 @@
 import React from "react";
 // import PropTypes from "prop-types";
-import axios from "axios";
 import {
   Grid,
   Container,
@@ -25,14 +24,13 @@ import { formatToDay, formatToDayOfWeek, isToday } from "../utils/date";
 import RecipeCard from "../RecipeCard";
 import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
-import { useRecipesState } from "../contexts/recipes";
 import { useStyles } from "./styles";
 import { useDaysList } from "./hooks/useDaysList";
+// import { useWhyDidYouUpdate } from "../hooks/useWhyDidYouUpdate";
 
 function Planning() {
   const classes = useStyles();
-  const { recipes, isLoading, isError, refresh } = useRecipesState();
-  const [days, setDays, addDays] = useDaysList(recipes);
+  const { days, addDays, isError, moveRecipe } = useDaysList();
 
   const [editing, setEditing] = React.useState(true);
 
@@ -41,11 +39,10 @@ function Planning() {
   const executeScroll = (smooth = true) => scrollToRef(todayRef, smooth);
   const topRef = React.useRef(null);
   const [topRefDate, setTopRefDate] = React.useState(null);
-  function onPreviousClick(){
+  function onPreviousClick() {
     setTopRefDate(days[0].date);
     addDays();
   };
-
   React.useEffect(() => scrollToRef(topRef, false), [topRefDate, days]);
 
   // Draggable
@@ -53,62 +50,20 @@ function Planning() {
     if (!result.destination) {
       return;
     }
-    const {source, destination, draggableId} = result;
+    const { source, destination, draggableId } = result;
     const newDate = destination.droppableId;
     const newIndex = destination.index;
     const oldDate = source.droppableId;
     const recipeId = draggableId.split("_")[0];
 
     if (newDate !== oldDate) {
-      const recipe = recipes.find(({ _id }) => _id === recipeId);
-
-      const updatedDays = [...days];
-      const oldDay = updatedDays.find(({ date }) => date === oldDate);
-      const newDay = updatedDays.find(({ date }) => date === newDate);
-      if (oldDay) {
-        oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
-      }
-      newDay.recipes.splice(newIndex, 0, recipe);
-      setDays(updatedDays);
-
-      const newDates = [
-        ...recipe.dates.filter(date => date !== oldDate),
-        newDate
-      ];
-      updateRecipeDates(recipe, newDates);
+      const add = { date: newDate, index: newIndex };
+      const remove = { date: oldDate };
+      moveRecipe({ id: recipeId, add, remove });
     }
   };
 
-  const onRemove = (recipe, srcDate) => {
-    const { _id: recipeId, dates } = recipe;
-
-    const updatedDays = [...days];
-    const oldDay = updatedDays.find(({ date }) => date === srcDate);
-    oldDay.recipes = oldDay.recipes.filter(({ _id }) => _id !== recipeId);
-    setDays(updatedDays);
-
-    const newDates = dates.filter(date => date !== srcDate);
-    updateRecipeDates(recipe, newDates);
-  };
-
-  const updateRecipeDates = async (recipe, dates) => {
-    const { _id: strictId, id, title, description, vegetarian } = recipe;
-    const options = {
-      url: `/api/recipes/${strictId}`,
-      method: "put",
-      data: {
-        id,
-        title,
-        description,
-        vegetarian,
-        dates
-      }
-    };
-    axios(options)
-      .then(r => console.log(r))
-      .catch(e => console.log(e))
-      .finally(() => refresh());
-  };
+  const onRemove = (id, date) => moveRecipe({ id, remove: { date } })
 
   const [isDialogOpen, setDialogOpen] = React.useState(false);
   const [pickDate, setPickDate] = React.useState(null);
@@ -116,19 +71,25 @@ function Planning() {
     setPickDate(date);
     setDialogOpen(true);
   };
-  const onPick = recipe => {
-    const updatedDays = [...days];
-    const targetDay = updatedDays.find(({ date }) => date === pickDate);
-    targetDay.recipes.push(recipe);
-    setDays(updatedDays);
-    const newDates = [...recipe.dates, pickDate];
-    updateRecipeDates(recipe, newDates);
+  const onPick = id => {
+    moveRecipe({ id, add: { date: pickDate } });
     setDialogOpen(false);
   };
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
+  // useWhyDidYouUpdate('Planning', {
+  //   isError,
+  //   days,
+  //   editing,
+  //   todayRef,
+  //   topRef,
+  //   topRefDate,
+  //   isDialogOpen,
+  //   pickDate,
+  // });
+  // // React.useEffect(() => console.log('UPDATED'))
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
@@ -194,7 +155,7 @@ function Planning() {
                                           classes={{
                                             sizeSmall: classes.rmvBtnSize
                                           }}
-                                          onClick={() => onRemove(recipe, date)}
+                                          onClick={() => onRemove(recipe._id, date)}
                                         >
                                           <ClearIcon
                                             className={classes.rmvIcon}
@@ -253,7 +214,7 @@ function Planning() {
           </DialogActions>
         </Dialog>
       </Container>
-      {!isLoading && !isError && (
+      {days.length > 0 && (
         <div className={classes.fabBox}>
           <Fab
             color="primary"

@@ -20,18 +20,18 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 
 router.get("/recipes", (req, res) => {
-  Recipe.find((err, data) => {
-    if (err) return res.json({ success: false, error: err });
-    return res.json({ success: true, data: data });
-  });
+  Recipe.find()
+    .select("id title description url vegetarian dates")
+    .then(recipes => res.json({ success: true, data: recipes }))
+    .catch(err => res.json({ success: false, error: err }))
 });
 
 router.get("/recipes/:id", (req, res) => {
   const { id } = req.params;
-  Recipe.findById(id, (err, data) => {
-    if (err) return res.json({ success: false, error: err });
-    return res.json({ success: true, data: data });
-  });
+  Recipe.findById(id)
+    .select("id title description url vegetarian dates")
+    .then(recipes => res.json({ success: true, data: recipes }))
+    .catch(err => res.json({ success: false, error: err }))
 });
 
 router.post("/recipes", (req, res) => {

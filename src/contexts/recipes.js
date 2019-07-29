@@ -6,10 +6,10 @@ function RecipesProvider({ children }) {
   const url = { url: `/api/recipes`, method: "get" };
   const [{ isLoading, isError, data }, setUrl] = useDataApi(url, []);
   const refresh = () => setUrl(url);
-
+  const recipes = data.data || [];
   return (
     <RecipesStateContext.Provider
-      value={{ recipes: data.data || [], isLoading, isError, refresh }}
+      value={{ recipes, isLoading, isError, refresh }}
     >
       {children}
     </RecipesStateContext.Provider>
@@ -22,4 +22,4 @@ function useRecipesState() {
   }
   return context;
 }
-export { RecipesProvider, useRecipesState };
+export { RecipesProvider, useRecipesState, RecipesStateContext };

@@ -2,18 +2,14 @@ import moment from "moment-with-locales-es6";
 
 const getLastDate = (dates = []) => {
   if (dates.length === 0) return false;
-  moment.locale("fr");
-  // return dates
-  //   .map(date => moment(date))
-  //   .sort((a, b) => moment(a).isBefore(b))[0];
-  const moments = dates.map(date => moment(date));
-  const sorted = moments.sort((a, b) => moment(a).isBefore(b));
+  const sorted = dates.sort((a, b) => new Date(b) - new Date(a));
   return sorted[0];
 };
 
 const getLastDateFromNow = (dates = []) => {
+  moment.locale("fr");
   const lastDate = getLastDate(dates);
-  return lastDate && lastDate.fromNow();
+  return lastDate && moment(lastDate).fromNow();
 };
 
 const compareLastDate = (datesA = [], datesB = []) => {
@@ -23,8 +19,8 @@ const compareLastDate = (datesA = [], datesB = []) => {
   } else if (!datesB.length) {
     return 1;
   } else {
-    const lastA = getLastDate(datesA);
-    const lastB = getLastDate(datesB);
+    const lastA = moment(getLastDate(datesA));
+    const lastB = moment(getLastDate(datesB));
     return lastA.isBefore(lastB) ? -1 : 1;
   }
 };

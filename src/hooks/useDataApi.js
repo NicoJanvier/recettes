@@ -31,7 +31,7 @@ const useDataApi = (initialUrl, initialData) => {
   const [url, setUrl] = React.useState(initialUrl);
 
   const [state, dispatch] = React.useReducer(dataFetchReducer, {
-    isLoading: false,
+    isLoading: true,
     isError: false,
     data: initialData
   });

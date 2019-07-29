@@ -18,10 +18,12 @@ import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import formFields from "../utils/formFields";
 import { navigate } from "@reach/router";
 import Dates from "../Dates/";
+import { RecipesStateContext } from "../contexts/recipes";
 
 const API_PATH = "/api";
 
 class Recipe extends React.Component {
+  static contextType = RecipesStateContext;
   constructor(props) {
     super(props);
     this.state = {
@@ -97,43 +99,37 @@ class Recipe extends React.Component {
     if (isNew) {
       options.url = `${API_PATH}/recipes`;
       options.method = "post";
-      callback = ({ _id }) => {
-        navigate(`/${_id}`);
-      };
+      callback = ({ _id }) => navigate(`/${_id}`);
     } else {
       options.url = `${API_PATH}/recipes/${this.props.id}`;
       options.method = "put";
-      callback = () => {
-        // navigate("/");
-        window.history.back();
-      };
+      callback = () => window.history.back();
     }
     this.setState({ hasChanged: false });
     axios(options)
-      .then(function(response) {
-        console.log(response);
+      .then(response => {
         if (response.data && response.data.success) {
+          this.context.refresh();
           callback(response.data.data);
         }
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log(error);
       });
   };
 
-  onRemove = async () => {
-    await axios({
+  onRemove = () =>
+    axios({
       url: `${API_PATH}/recipes/${this.props.id}`,
       method: "delete"
     })
-      .then(function(response) {
-        console.log(response);
-        navigate("/");
+      .then(() => {
+        this.context.refresh();
+        window.history.back();
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log(error);
       });
-  };
 
   onCheck = (event, checked) => {
     const { name } = event.target;

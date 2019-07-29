@@ -45,7 +45,7 @@ function RecipeCard({ recipe, noDate = false, selected = false, onPick}) {
         <Button component={RouterLink} to={`/${_id}`}>
           PLUS
         </Button>
-        {!!onPick && <Button onClick={() => onPick(recipe)}>AJOUTER</Button>}
+        {!!onPick && <Button onClick={() => onPick(recipe._id)}>AJOUTER</Button>}
       </CardActions>
     </Card>
   );
