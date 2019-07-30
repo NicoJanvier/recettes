@@ -1,5 +1,5 @@
 import React from "react";
-import { Router } from "@reach/router";
+import { Router, Redirect } from "@reach/router";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -33,7 +33,8 @@ export default function App() {
         <HeaderBar/>
         <Box className={classes.box}>
           <Router>
-            <Planning path="/"/>
+            <Redirect from="/" to="/planning" noThrow/>
+            <Planning path="/planning"/>
             <List path="/list"/>
             {/* <NewRecipe path="/new" /> */}
             <Recipe path="/:id"/>

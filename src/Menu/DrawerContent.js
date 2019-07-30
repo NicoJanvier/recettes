@@ -23,7 +23,7 @@ const DrawerContent = ({ classes, onNavigate }) => {
       {
         label: "Planning",
         icon: DateRangeIcon,
-        onClick: () => onClick('/'), 
+        onClick: () => onClick('/planning'), 
       },
       {
         label: "List",
