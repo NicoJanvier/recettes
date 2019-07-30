@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import moment from "moment";
+import "moment/locale/fr";
 import MomentUtils from "@date-io/moment";
 import {
   Button,
@@ -48,7 +49,7 @@ function Dates(props) {
       <div>
         <Grid container spacing={2} alignItems="flex-end">
           <Grid item>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
+            <MuiPickersUtilsProvider utils={MomentUtils} locale="fr">
               <KeyboardDatePicker
                 value={value}
                 onChange={date => setValue(date || moment())}
