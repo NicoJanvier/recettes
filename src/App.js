@@ -5,8 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import { RecipesProvider } from "./contexts/recipes";
 
-import Recipe from "./Recipe/index";
-// import NewRecipe from "./NewRecipe";
+import Recipe from "./Recipe";
 import List from "./List";
 import HeaderBar from "./HeaderBar";
 import { Box } from "@material-ui/core";
