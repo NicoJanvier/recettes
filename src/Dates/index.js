@@ -19,30 +19,26 @@ const useStyles = makeStyles({
   button: {
     // padding: "2px",
   },
-  chip: { margin: "5px"}
-});
-
-const toEventLike = value => ({
-  target: {
-    name: "dates",
-    value
-  }
+  chip: { margin: "5px" }
 });
 
 function Dates(props) {
   const classes = useStyles();
-  const { name, dates, label, mandatory, onSubmit } = props;
-  const [value, setValue] = React.useState(moment());
+  const { name, value, label, register, onChange } = props;
+  const [dates, setDates] = React.useState(value);
+  const [pickerValue, setPickerValue] = React.useState(moment());
 
-  const onAdd = React.useCallback(() => {
-    onSubmit(toEventLike([value.format("YYYY-MM-DD"), ...dates]));
-    setValue(moment());
-  }, [value, dates, onSubmit]);
+  const onAdd = () => {
+    const newDates = [...dates, pickerValue.format("YYYY-MM-DD")]
+    setDates(newDates);
+    onChange(newDates)
+    setPickerValue(moment());
+  }
 
   const onRemove = index => {
     const newDates = [...dates];
     newDates.splice(index, 1);
-    onSubmit(toEventLike(newDates));
+    setDates(newDates);
   };
   return (
     <>
@@ -51,17 +47,16 @@ function Dates(props) {
           <Grid item>
             <MuiPickersUtilsProvider utils={MomentUtils} locale="fr">
               <KeyboardDatePicker
-                value={value}
-                onChange={date => setValue(date || moment())}
+                value={pickerValue}
+                onChange={date => setPickerValue(date || moment())}
                 format="DD/MM/YYYY"
                 label={label}
-                required={mandatory}
                 name={name}
               />
             </MuiPickersUtilsProvider>
           </Grid>
           <Grid item>
-            <Button aria-label="Add date" variant="outlined" onClick={onAdd}>
+            <Button aria-label="Add date" variant="outlined" onClick={() => onAdd()}>
               <AddIcon />
               Ajouter
             </Button>
@@ -69,24 +64,29 @@ function Dates(props) {
         </Grid>
       </div>
       <div>
-        {dates &&
-          dates.map((date, i) => (
-            <Chip
-              key={`${date}-${i}`}
-              className={classes.chip}
-              variant="outlined"
-              onDelete={onRemove.bind(this, i)}
-              label={date}
-            />
-          ))}
+        {dates
+          .sort((a,b) => new Date(b) - new Date(a))
+          .map((date, i) => (
+          <Chip
+            key={`${date}-${i}`}
+            className={classes.chip}
+            variant="outlined"
+            onDelete={onRemove.bind(this, i)}
+            label={date}
+          />
+        ))}
+        <input name={name} ref={register} value={JSON.stringify(dates)} style={{display: 'none'}} onChange={() => {}}/>
       </div>
     </>
   );
 }
 
 Dates.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  dates: PropTypes.array.isRequired
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.array.isRequired,
+  register: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default Dates;

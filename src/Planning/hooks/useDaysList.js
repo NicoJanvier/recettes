@@ -59,7 +59,7 @@ function reducer(state, action) {
 }
 
 function useDaysList() {
-  const { recipes, isError, refresh } = useRecipesState();
+  const { recipes, isError, updateRecipe } = useRecipesState();
   const [{ days }, dispatch] = React.useReducer(reducer, { days: [], offset: 0 });
 
   const addDays = () => dispatch({ type: 'addDays', payload: { recipes } });
@@ -67,25 +67,6 @@ function useDaysList() {
   React.useEffect(() => {
     dispatch({ type: 'fromRecipes', payload: { recipes } })
   }, [recipes]);
-
-  async function updateRecipe(recipe) {
-    const { _id: strictId, id, title, description, vegetarian, dates } = recipe;
-    const options = {
-      url: `/api/recipes/${strictId}`,
-      method: "put",
-      data: {
-        id,
-        title,
-        description,
-        vegetarian,
-        dates
-      }
-    };
-    axios(options)
-      .then(r => console.log(r))
-      .catch(e => console.log(e))
-      .finally(() => refresh());
-  };
 
   const moveRecipe = ({ id, add, remove }) => {
     const recipe = recipes.find(({ _id }) => _id === id);
