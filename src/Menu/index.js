@@ -1,18 +1,13 @@
 import React from "react";
 import { Hidden, Drawer } from "@material-ui/core";
-
 import DrawerContent from "./DrawerContent";
 
-
-
-const Menu = ({mobileOpen, setMobileOpen, classes}) => {
+const Menu = ({ mobileOpen, setMobileOpen, classes }) => {
   return (
     <nav className={classes.drawer} aria-label="Mailbox folders">
       <Hidden smUp implementation="css">
         <Drawer
-          // container={container}
           variant="temporary"
-          // anchor={theme.direction === 'rtl' ? 'right' : 'left'}
           open={mobileOpen}
           onClose={() => setMobileOpen(!mobileOpen)}
           classes={{
@@ -22,7 +17,7 @@ const Menu = ({mobileOpen, setMobileOpen, classes}) => {
             keepMounted: true // Better open performance on mobile.
           }}
         >
-          <DrawerContent classes={classes} onNavigate={() => setMobileOpen(false)}/>
+          <DrawerContent classes={classes} onNavigate={() => setMobileOpen(false)} />
         </Drawer>
       </Hidden>
       <Hidden xsDown implementation="css">
@@ -33,7 +28,7 @@ const Menu = ({mobileOpen, setMobileOpen, classes}) => {
           variant="permanent"
           open
         >
-          <DrawerContent classes={classes} onNavigate={() => setMobileOpen(false)}/>
+          <DrawerContent classes={classes} onNavigate={() => setMobileOpen(false)} />
         </Drawer>
       </Hidden>
     </nav>

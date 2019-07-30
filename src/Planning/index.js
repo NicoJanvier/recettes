@@ -1,5 +1,4 @@
 import React from "react";
-// import PropTypes from "prop-types";
 import {
   Grid,
   Container,
@@ -26,7 +25,6 @@ import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
 import { useStyles } from "./styles";
 import { useDaysList } from "./hooks/useDaysList";
-// import { useWhyDidYouUpdate } from "../hooks/useWhyDidYouUpdate";
 
 function Planning() {
   const classes = useStyles();
@@ -79,17 +77,6 @@ function Planning() {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // useWhyDidYouUpdate('Planning', {
-  //   isError,
-  //   days,
-  //   editing,
-  //   todayRef,
-  //   topRef,
-  //   topRefDate,
-  //   isDialogOpen,
-  //   pickDate,
-  // });
-  // // React.useEffect(() => console.log('UPDATED'))
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>

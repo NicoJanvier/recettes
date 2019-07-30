@@ -1,6 +1,5 @@
 import React from "react";
 import moment from "moment";
-import axios from "axios";
 import { useRecipesState } from "../../contexts/recipes";
 
 function generateDateList(offset) {
