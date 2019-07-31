@@ -21,7 +21,7 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 router.get("/recipes", (req, res) => {
   Recipe.find()
-    .select("id title description url vegetarian dates")
+    .select("title description url vegetarian dates")
     .then(recipes => res.json({ success: true, data: recipes }))
     .catch(err => res.json({ success: false, error: err }))
 });
@@ -29,7 +29,7 @@ router.get("/recipes", (req, res) => {
 router.get("/recipes/:id", (req, res) => {
   const { id } = req.params;
   Recipe.findById(id)
-    .select("id title description url vegetarian dates")
+    .select("title description url vegetarian dates")
     .then(recipes => res.json({ success: true, data: recipes }))
     .catch(err => res.json({ success: false, error: err }))
 });

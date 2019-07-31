@@ -1,4 +1,4 @@
-import moment from "moment-with-locales-es6";
+import moment from "moment";
 
 const getLastDate = (dates = []) => {
   if (dates.length === 0) return false;

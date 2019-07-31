@@ -9,12 +9,11 @@ function RecipesProvider({ children }) {
   const refresh = () => setUrl(api);
 
   async function updateRecipe(recipe) {
-    const { _id: strictId, id, title, description, url, vegetarian, dates } = recipe;
+    const { _id: strictId, title, description, url, vegetarian, dates } = recipe;
     const options = {
       url: `/api/recipes/${strictId}`,
       method: "put",
       data: {
-        id,
         title,
         description,
         url,
