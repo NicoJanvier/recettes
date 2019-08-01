@@ -20,7 +20,7 @@ function getDays(recipes, offset) {
       .map(date => ({
         date,
         recipes: recipes
-          .filter(({ dates }) => dates.includes(date))
+          .filter(({ dates }) => dates.map(d => d.date).includes(date))
       }));
     return days
   }
@@ -70,8 +70,8 @@ function useDaysList() {
   const moveRecipe = ({ id, add, remove }) => {
     const recipe = recipes.find(({ _id }) => _id === id);
     dispatch({ type: 'updateDays', payload: { recipe, add, remove } });
-    if (!!remove) recipe.dates = recipe.dates.filter(date => date !== remove.date);
-    if (!!add) recipe.dates.push(add.date);
+    if (!!remove) recipe.dates = recipe.dates.filter(({ date }) => date !== remove.date);
+    if (!!add) recipe.dates.push({ date: add.date, note: '' });
     updateRecipe(recipe);
   }
 

@@ -18,7 +18,7 @@ import { useStyles } from "./styles";
 function RecipeCard({ recipe, noDate = false, selected = false, onPick}) {
   const classes = useStyles();
   const { title, _id, url, vegetarian: veg, dates } = recipe;
-  const lastDate = getLastDateFromNow(dates);
+  const lastDate = getLastDateFromNow(dates.map(d => d.date));
   return (
     <Card className={selected ? classes.selectedCard : ""}>
       <CardContent>

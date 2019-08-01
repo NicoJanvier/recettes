@@ -9,7 +9,10 @@ const DataSchema = new Schema(
     description: String,
     url: String,
     vegetarian: Boolean,
-    dates: [String],
+    dates: [{
+      date: String,
+      note: String,
+    }],
   },
   { timestamps: true }
 );

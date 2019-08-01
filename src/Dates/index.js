@@ -5,7 +5,6 @@ import "moment/locale/fr";
 import MomentUtils from "@date-io/moment";
 import {
   Button,
-  Chip,
   Grid,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
@@ -14,6 +13,7 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
 } from "@material-ui/pickers";
+import DateNoteCard from "./dateNote";
 
 const useStyles = makeStyles({
   button: {
@@ -29,16 +29,25 @@ function Dates(props) {
   const [pickerValue, setPickerValue] = React.useState(moment());
 
   const onAdd = () => {
-    const newDates = [...dates, pickerValue.format("YYYY-MM-DD")]
+    const newDates = [...dates, { date: pickerValue.format("YYYY-MM-DD"), note: "" }];
     setDates(newDates);
-    onChange(newDates)
+    onChange(); // "touch" dates input
     setPickerValue(moment());
+  }
+
+  const onNote = index => value => {
+    setDates(prevDates => {
+      prevDates[index].note = value;
+      return prevDates;
+    });
+    onChange();
   }
 
   const onRemove = index => {
     const newDates = [...dates];
     newDates.splice(index, 1);
     setDates(newDates);
+    onChange();
   };
   return (
     <>
@@ -64,18 +73,25 @@ function Dates(props) {
         </Grid>
       </div>
       <div>
-        {dates
-          .sort((a,b) => new Date(b) - new Date(a))
-          .map((date, i) => (
-          <Chip
-            key={`${date}-${i}`}
-            className={classes.chip}
-            variant="outlined"
-            onDelete={onRemove.bind(this, i)}
-            label={date}
+        <Grid container spacing={2}>
+          {dates
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .map((date, i) => (
+              <DateNoteCard
+                key={`${date.date}-${i}`}
+                content={date}
+                onChange={onNote(i)}
+                onDelete={onRemove.bind(this, i)}
+              />
+            ))}
+          <input
+            name={name}
+            ref={register}
+            value={JSON.stringify(dates)}
+            onChange={() => { }}
+            style={{ display: "none" }}
           />
-        ))}
-        <input name={name} ref={register} value={JSON.stringify(dates)} style={{display: 'none'}} onChange={() => {}}/>
+        </Grid>
       </div>
     </>
   );
