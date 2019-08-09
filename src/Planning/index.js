@@ -83,7 +83,7 @@ function Planning() {
       <Container>
         {isError && "ERROR"}
         <Grid container spacing={4} direction="column">
-          <Button onClick={() => onPreviousClick()}>Précédent jours</Button>
+          <Button onClick={() => onPreviousClick()} color="primary">Jours précédents</Button>
           {days.map(({ date, recipes }) => {
             return (
               <React.Fragment key={date}>
@@ -158,7 +158,7 @@ function Planning() {
                             {editing && (
                               <Grid item xs={12} className={classes.addBtnCard}>
                                 <IconButton
-                                  color="secondary"
+                                  color="primary"
                                   onClick={() => onClickPick(date)}
                                 >
                                   <AddIcon />

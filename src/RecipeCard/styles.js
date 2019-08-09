@@ -15,7 +15,7 @@ const useStyles = makeStyles({
       marginLeft: "6px"
     },
     selectedCard: {
-      backgroundColor: green[100],
+      backgroundColor: green[200],
     },
     notesFieldIcon: {
       color: grey[500],
