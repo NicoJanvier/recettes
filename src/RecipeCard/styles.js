@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/styles";
-import { green } from "@material-ui/core/colors";
+import { green, grey } from "@material-ui/core/colors";
 
 const useStyles = makeStyles({
     cardAction: {
@@ -17,6 +17,12 @@ const useStyles = makeStyles({
     selectedCard: {
       backgroundColor: green[100],
     },
+    notesFieldIcon: {
+      color: grey[500],
+    },
+    notesFieldButton: {
+      padding: "0px 0px 0px 8px",
+    }
   });
 
 export { useStyles };

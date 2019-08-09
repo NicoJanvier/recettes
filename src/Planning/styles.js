@@ -55,8 +55,8 @@ const useStyles = makeStyles({
         backgroundColor: "rgba(0, 0, 0, 0.01)"
       },
       "& button": {
-        width: "25px",
-        height: "25px",
+        minWidth: "25px",
+        minHeight: "25px",
         transform: "scale(1)"
       }
     }

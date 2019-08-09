@@ -132,7 +132,7 @@ function Planning() {
                                       >
                                         <RecipeCard
                                           recipe={recipe}
-                                          noDate
+                                          plannedDate={date}
                                           selected={isToday(date)}
                                         />
                                         <Fab

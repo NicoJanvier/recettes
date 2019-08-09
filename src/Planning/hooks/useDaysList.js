@@ -45,10 +45,16 @@ function reducer(state, action) {
       if (!!add) {
         const addDay = days.find(({ date }) => date === add.date);
         const { index = recipe.dates.length } = add;
+        let note = "";
+        if (!!remove) {
+          note = recipe.dates.find(({date}) => date === remove.date).note;
+        }
+        recipe.dates.push({ date: add.date, note });
         addDay.recipes.splice(index, 0, recipe);
       }
       if (!!remove) {
         const removeDay = days.find(({ date }) => date === remove.date);
+        recipe.dates = recipe.dates.filter(({ date }) => date !== remove.date);
         removeDay.recipes = removeDay.recipes.filter(({ _id }) => _id !== recipe._id);
       }
       return { ...state, days }
@@ -70,9 +76,7 @@ function useDaysList() {
   const moveRecipe = ({ id, add, remove }) => {
     const recipe = recipes.find(({ _id }) => _id === id);
     dispatch({ type: 'updateDays', payload: { recipe, add, remove } });
-    if (!!remove) recipe.dates = recipe.dates.filter(({ date }) => date !== remove.date);
-    if (!!add) recipe.dates.push({ date: add.date, note: '' });
-    updateRecipe(recipe);
+    updateRecipe(recipe); //recipe is being mutated in the dispatch method...
   }
 
   return { days, addDays, isError, moveRecipe };
