@@ -14,7 +14,7 @@ import RootRef from "@material-ui/core/RootRef";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
-import DateRangeIcon from "@material-ui/icons/DateRange";
+// import DateRangeIcon from "@material-ui/icons/DateRange";
 import ClearIcon from "@material-ui/icons/Clear";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
@@ -30,11 +30,12 @@ function Planning() {
   const classes = useStyles();
   const { days, addDays, isError, moveRecipe } = useDaysList();
 
-  const [editing, setEditing] = React.useState(true);
+  // const [editing, setEditing] = React.useState(true);
+  const editing = true;
 
   // Scrolling
   const todayRef = React.useRef(null);
-  const executeScroll = (smooth = true) => scrollToRef(todayRef, smooth);
+  // const executeScroll = (smooth = true) => scrollToRef(todayRef, smooth);
   const topRef = React.useRef(null);
   const [topRefDate, setTopRefDate] = React.useState(null);
   function onPreviousClick() {
@@ -201,7 +202,7 @@ function Planning() {
           </DialogActions>
         </Dialog>
       </Container>
-      {days.length > 0 && (
+      {/* {days.length > 0 && (
         <div className={classes.fabBox}>
           <Fab
             color="primary"
@@ -220,7 +221,7 @@ function Planning() {
             <DateRangeIcon />
           </Fab>
         </div>
-      )}
+      )} */}
     </DragDropContext>
   );
 }
