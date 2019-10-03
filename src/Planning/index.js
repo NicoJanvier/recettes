@@ -137,13 +137,14 @@ function Planning() {
                                           selected={isToday(date)}
                                         />
                                         <Fab
-                                          color="secondary"
+                                          color="primary"
                                           size="small"
                                           className={classes.rmvBtn}
                                           classes={{
                                             sizeSmall: classes.rmvBtnSize
                                           }}
                                           onClick={() => onRemove(recipe._id, date)}
+                                          name="remove"
                                         >
                                           <ClearIcon
                                             className={classes.rmvIcon}

@@ -30,13 +30,18 @@ router.get("/recipes/:id", (req, res) => {
   const { id } = req.params;
   Recipe.findById(id)
     .select("title description url vegetarian dates")
-    .then(recipes => res.json({ success: true, data: recipes }))
+    .then(recipe => {
+      console.log('GET RECIPE', recipe);
+      if (recipe) {
+        res.json({ success: true, data: recipe })
+      }
+      res.status(404).json({ success: false, error: `no resources found at id: ${id}` })
+    })
     .catch(err => res.json({ success: false, error: err }))
 });
 
 router.post("/recipes", (req, res) => {
-  const id = mongoose.Types.ObjectId();
-  let recipe = new Recipe({ ...req.body, id });
+  let recipe = new Recipe({ ...req.body });
   try {
     recipe.save((err, result) => {
       if (err) return res.json({ success: false, error: err });

@@ -54,7 +54,7 @@ const useStyles = makeStyles({
       "& .MuiCard-root": {
         backgroundColor: "rgba(0, 0, 0, 0.01)"
       },
-      "& button": {
+      '& button[name="remove"]': {
         minWidth: "25px",
         minHeight: "25px",
         transform: "scale(1)"
