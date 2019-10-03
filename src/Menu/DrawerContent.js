@@ -5,12 +5,14 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  ListSubheader
 } from "@material-ui/core";
 
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import ListIcon from "@material-ui/icons/List";
+import Toys from "@material-ui/icons/Toys";
 import GoogleIcon from "./logo/GoogleIcon";
 
 const DrawerContent = ({ classes, onNavigate }) => {
@@ -19,47 +21,65 @@ const DrawerContent = ({ classes, onNavigate }) => {
     navigate(path);
   }
   const navItems = [
-    [
-      {
-        label: "Planning",
-        icon: DateRangeIcon,
-        onClick: () => onClick('/planning'), 
-      },
-      {
-        label: "List",
-        icon: ListIcon,
-        onClick: () => onClick('/list'), 
-      },
-      {
-        label: "Nouveau",
-        icon: PlaylistAddIcon,
-        onClick: () => onClick('/new'), 
-      }
-    ],
-    [
-      {
-        label: "Shopping List",
-        icon: GoogleIcon,
-        component: 'a',
-        href: "https://shoppinglist.google.com",
-        rel: "noopener noreferrer",
-        target: "_blank"
-      }
-    ]
+    {
+      key: 'internalLinks',
+      nav: [
+        {
+          label: "Planning",
+          icon: DateRangeIcon,
+          onClick: () => onClick('/planning'),
+        },
+        {
+          label: "List",
+          icon: ListIcon,
+          onClick: () => onClick('/list'),
+        },
+        {
+          label: "Nouveau",
+          icon: PlaylistAddIcon,
+          onClick: () => onClick('/new'),
+        }
+      ]
+    },
+    {
+      key: 'externalLinks',
+      title: 'APP EXTERNES',
+      nav: [
+        {
+          label: "Shopping List",
+          icon: GoogleIcon,
+          component: 'a',
+          href: "https://shoppinglist.google.com",
+          rel: "noopener noreferrer",
+          target: "_blank"
+        },
+        {
+          label: "Cookidoo",
+          icon: Toys,
+          component: 'a',
+          href: "https://cookidoo.fr/foundation/fr-FR",
+          rel: "noopener noreferrer",
+          target: "_blank"
+        }
+      ]
+    }
   ];
   return (
     <div>
       <div className={classes.toolbar} />
-      {navItems.map(navGroup => (
-        <React.Fragment key={navGroup[0].label}>
+      {navItems.map(({ title, nav, key }) => (
+        <React.Fragment key={key}>
           <Divider />
-          <List>
-            {navGroup.map(({ label, icon: Icon, ...props }) => (
+          <List
+          subheader={title ? (
+            <ListSubheader component="div">{title}</ListSubheader>
+          ) : null}>
+            {nav.map(({ label, icon: Icon, ...props }) => (
               <ListItem key={label} button {...props}>
                 <ListItemIcon>
                   <Icon />
                 </ListItemIcon>
-                <ListItemText primary={label}/>
+                <ListItemText primary={label} />
               </ListItem>
             ))}
           </List>
