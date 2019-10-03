@@ -82,11 +82,12 @@ function Planning() {
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
         {isError && "ERROR"}
-        <Grid container spacing={4} direction="column">
-          <Button onClick={() => onPreviousClick()} color="primary">Jours précédents</Button>
-          {days.map(({ date, recipes }) => {
-            return (
-              <React.Fragment key={date}>
+        <Grid container spacing={4} direction="column" alignItems="center">
+          <Grid item spacing={2}>
+            <Button onClick={() => onPreviousClick()} color="primary" >Jours précédents</Button>
+          </Grid>
+          {days.map(({ date, recipes }) => (
+            <React.Fragment key={date}>
                 {isToday(date) && <div ref={todayRef} />}
                 {(recipes.length > 0 || editing) && (
                   <Grid
@@ -174,8 +175,7 @@ function Planning() {
                   </Grid>
                 )}
               </React.Fragment>
-            );
-          })}
+          ))}
         </Grid>
         <Dialog
           open={isDialogOpen}
