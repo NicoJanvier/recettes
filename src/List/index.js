@@ -17,43 +17,47 @@ import { compareLastDate } from "../utils/date";
 import { useRecipesState } from "../contexts/recipes";
 import { useStyles } from "./styles";
 
+
 export default function List({ onPick }) {
   const classes = useStyles();
   const { recipes, isError } = useRecipesState();
-  const [listRecipes, setListRecipes] = React.useState(recipes);
 
   const [search, setSearch] = React.useState("");
   const [vegFilter, setVegFilter] = React.useState(false);
   const [sortDate, setSortDate] = React.useState(true);
 
-  React.useEffect(() => {
-    const allRecipes = recipes;
-    const lowSearch = search.toLowerCase();
-    const searchedRecipes = allRecipes
-      .filter(recipe => {
-        const lowTitle = recipe.title.toLowerCase();
-        return lowTitle.includes(lowSearch) && recipe;
-      })
-      .filter(recipe => {
-        if (vegFilter) {
-          return recipe.vegetarian;
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortDate) {
-          return compareLastDate(a.dates, b.dates);
-        } else if (search) {
-          return (
-            a.title.toLowerCase().indexOf(lowSearch) -
-            b.title.toLowerCase().indexOf(lowSearch)
-          );
-        } else {
-          return a.title.localeCompare(b.title);
-        }
-      });
-    setListRecipes(searchedRecipes);
-  }, [recipes, search, sortDate, vegFilter]);
+  const applyChanges = React.useCallback(
+    () => {
+      const allRecipes = recipes;
+      const lowSearch = search.toLowerCase();
+      return allRecipes
+        .filter(recipe => {
+          const lowTitle = recipe.title.toLowerCase();
+          return lowTitle.includes(lowSearch) && recipe;
+        })
+        .filter(recipe => {
+          if (vegFilter) {
+            return recipe.vegetarian;
+          }
+          return true;
+        })
+        .sort((a, b) => {
+          if (sortDate) {
+            return compareLastDate(a.dates, b.dates);
+          } else if (search) {
+            return (
+              a.title.toLowerCase().indexOf(lowSearch) -
+              b.title.toLowerCase().indexOf(lowSearch)
+            );
+          } else {
+            return a.title.localeCompare(b.title);
+          }
+        });
+    },
+    [recipes, search, vegFilter, sortDate],
+  );
+
+  const listRecipes = applyChanges();
 
   return (
     <>
@@ -78,8 +82,8 @@ export default function List({ onPick }) {
                     <ClearIcon />
                   </IconButton>
                 ) : (
-                  <SearchIcon className={classes.searchIcon} />
-                )}
+                    <SearchIcon className={classes.searchIcon} />
+                  )}
                 <Divider className={classes.divider} />
                 <IconButton onClick={() => setVegFilter(!vegFilter)}>
                   <Avatar
