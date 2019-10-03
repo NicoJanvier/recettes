@@ -11,6 +11,7 @@
     "axios": "^0.19.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
+    "fuse.js": "^3.4.5",
     "moment": "^2.24.0",
     "mongoose": "^5.6.0",
     "morgan": "^1.9.1",
@@ -28,7 +29,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "deploy": "git push heroku master"
   },
   "proxy": "http://localhost:5000",
   "eslintConfig": {

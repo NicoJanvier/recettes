@@ -1,4 +1,5 @@
 import React from "react";
+import Fuse from 'fuse.js'
 import {
   Grid,
   Container,
@@ -26,36 +27,35 @@ export default function List({ onPick }) {
   const [vegFilter, setVegFilter] = React.useState(false);
   const [sortDate, setSortDate] = React.useState(true);
 
-  const applyChanges = React.useCallback(
+
+  const fuse = React.useCallback(
     () => {
-      const allRecipes = recipes;
-      const lowSearch = search.toLowerCase();
-      return allRecipes
-        .filter(recipe => {
-          const lowTitle = recipe.title.toLowerCase();
-          return lowTitle.includes(lowSearch) && recipe;
-        })
-        .filter(recipe => {
-          if (vegFilter) {
-            return recipe.vegetarian;
-          }
-          return true;
-        })
-        .sort((a, b) => {
-          if (sortDate) {
-            return compareLastDate(a.dates, b.dates);
-          } else if (search) {
-            return (
-              a.title.toLowerCase().indexOf(lowSearch) -
-              b.title.toLowerCase().indexOf(lowSearch)
-            );
-          } else {
-            return a.title.localeCompare(b.title);
-          }
-        });
+      const fuseOptions = {
+        keys: ['title'],
+        threshold: 0.35,
+      };
+      const fuse = new Fuse(recipes, fuseOptions);
+      return fuse.search(search);
     },
-    [recipes, search, vegFilter, sortDate],
+    [recipes, search],
   );
+
+
+  const applyChanges = () => {
+    return (search ? fuse() : recipes)
+      .filter(recipe => {
+        if (vegFilter) {
+          return recipe.vegetarian;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortDate) {
+          return compareLastDate(a.dates, b.dates);
+        }
+        return null;
+      });
+  };
 
   const listRecipes = applyChanges();
 
