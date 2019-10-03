@@ -19,8 +19,8 @@ const compareLastDate = (datesA = [], datesB = []) => {
   } else if (!datesB.length) {
     return 1;
   } else {
-    const lastA = moment(getLastDate(datesA));
-    const lastB = moment(getLastDate(datesB));
+    const lastA = moment(getLastDate(datesA.map(({ date }) => date)));
+    const lastB = moment(getLastDate(datesB.map(({ date }) => date)));
     return lastA.isBefore(lastB) ? -1 : 1;
   }
 };
