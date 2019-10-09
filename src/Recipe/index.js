@@ -10,7 +10,21 @@ import Dates from "../Dates";
 
 const Recipe = ({ id }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
-  const { register, errors, handleSubmit, formState, setValue } = useForm();
+  const isRecipeEmpty = !recipe.title;
+  const { register, errors, handleSubmit, formState, setValue, getValues } = useForm();
+
+  const { isValid, touched } = formState;
+  const formRef = React.useRef(null);
+  React.useEffect(() => {
+    const values = getValues();
+    if (isValid && touched.includes("dates") && values.dates && JSON.parse(values.dates).length !== recipe.dates.length) {
+      const timer = setTimeout(() => {
+        formRef.current.dispatchEvent(new Event('submit'));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isValid, touched, getValues, recipe, formRef]);
+
   const onSubmit = data => {
     onSave({
       ...data,
@@ -20,83 +34,82 @@ const Recipe = ({ id }) => {
         if (id === "new") {
           const id = res.data.data._id;
           navigate(`/${id}`);
-        } else {
-          window.history.back();
         }
       })
   };
   const onDelete = () => onRemove().then(() => window.history.back());
   return (
     <Container key={id}>
-      {!isLoading && <form onSubmit={handleSubmit(data => onSubmit(data))}>
-        <TextField
-          name="title"
-          label="Titre *"
-          fullWidth
-          inputRef={register({ required: true })}
-          error={!!errors.title}
-          defaultValue={recipe.title}
-        />
-        <TextField
-          name="description"
-          label="Description"
-          type="textarea"
-          multiline
-          fullWidth
-          inputRef={register}
-          defaultValue={recipe.description}
-        />
-        <TextField
-          label="Lien"
-          name="url"
-          type="url"
-          defaultValue={recipe.url}
-          fullWidth
-          inputRef={register}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  edge="end"
-                  component="a"
-                  aria-label="Open link"
-                  disabled={!recipe.url}
-                  href={recipe.url}
-                  rel="noopener"
-                  target="_blank"
-                >
-                  <OpenInNewIcon />
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              defaultChecked={recipe.vegetarian}
-              name="vegetarian"
-              inputRef={register}
-            />
-          }
-          label="Végétarien"
-          labelPlacement="end"
-        />
-        <Dates
-          name="dates"
-          label="Dates"
-          value={recipe.dates}
-          register={register}
-          onChange={val => setValue('dates', val)}
-        />
-        <Button type="submit" disabled={!formState.dirty} variant="outlined">
-          Sauvegarder
+      {!(isLoading && isRecipeEmpty) &&
+        <form ref={formRef} onSubmit={handleSubmit(data => onSubmit(data))}>
+          <TextField
+            name="title"
+            label="Titre *"
+            fullWidth
+            inputRef={register({ required: true })}
+            error={!!errors.title}
+            defaultValue={recipe.title}
+          />
+          <TextField
+            name="description"
+            label="Description"
+            type="textarea"
+            multiline
+            fullWidth
+            inputRef={register}
+            defaultValue={recipe.description}
+          />
+          <TextField
+            label="Lien"
+            name="url"
+            type="url"
+            defaultValue={recipe.url}
+            fullWidth
+            inputRef={register}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    component="a"
+                    aria-label="Open link"
+                    disabled={!recipe.url}
+                    href={recipe.url}
+                    rel="noopener"
+                    target="_blank"
+                  >
+                    <OpenInNewIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                defaultChecked={recipe.vegetarian}
+                name="vegetarian"
+                inputRef={register}
+              />
+            }
+            label="Végétarien"
+            labelPlacement="end"
+          />
+          <Dates
+            name="dates"
+            label="Dates"
+            value={recipe.dates}
+            register={register}
+            onChange={val => setValue('dates', val)}
+          />
+          <Button type="submit" disabled={!formState.dirty} variant="outlined">
+            Sauvegarder
         </Button>
-        {(id !== "new") && <Button onClick={() => onDelete().then(() => window.history.back())} variant="contained">
-          <DeleteIcon />
-          Supprimer
-        </Button>}
-      </form>}
+          {(id !== "new") &&
+            <Button onClick={() => onDelete().then(() => window.history.back())} variant="contained">
+              <DeleteIcon /> Supprimer
+            </Button>}
+        </form>}
     </Container>
   );
 };
