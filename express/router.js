@@ -2,7 +2,12 @@ const express = require("express");
 // require('dotenv').config();
 const mongoose = require("mongoose");
 const withAuth = require('./middleware');
+
 const Recipe = require("./models/Recipes");
+const RecipeV2 = require("./models/Recipe");
+const House = require("./models/House");
+const User = require("./models/User");
+const PlanningPoint = require("./models/PlanningPoint");
 
 const router = express.Router();
 
@@ -23,6 +28,7 @@ router.get("/recipes", (req, res) => {
     .catch(err => res.json({ success: false, error: err }))
 });
 
+// Unused
 router.get("/recipes/:id", (req, res) => {
   const { id } = req.params;
   Recipe.findById(id)
@@ -57,7 +63,7 @@ router.put("/recipes/:id", withAuth, (req, res) => {
   });
 });
 
-router.delete("/recipes/:id", withAuth,(req, res) => {
+router.delete("/recipes/:id", withAuth, (req, res) => {
   const { id } = req.params;
   Recipe.findByIdAndRemove(id, (err, data) => {
     if (err) return res.json({ success: false, error: err });
@@ -65,28 +71,15 @@ router.delete("/recipes/:id", withAuth,(req, res) => {
   });
 });
 
-const User = require("./models/User");
-router.post("/users/register", (req, res) => {
-  const { email, password } = req.body;
-  const user = new User({ email, password, group: 'invite' });
-  user.save(function(err) {
-    if (err) {
-      res.status(500)
-        .send("Error registering new user please try again.");
-    } else {
-      res.status(200).send("Welcome to the club!");
-    }
-  });
-});
 
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET;
-router.post("users/authenticate", (req, res) => {
+router.post("/users/authenticate", (req, res) => {
   const { email, password } = req.body;
+  console.log(`Authenticating ${email} with ${password}`);
   User.findOne({ email }, (err, user) => {
     if (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal error please try again'});
+      res.status(500).json({ error: 'Internal error please try again' });
     } else if (!user) {
       res.status(401).json({ error: 'Incorrect email or password' });
     } else {
@@ -99,7 +92,7 @@ router.post("users/authenticate", (req, res) => {
           // Issue token
           const payload = { email };
           const token = jwt.sign(payload, secret, {
-            expiresIn: '1h'
+            expiresIn: '30 minutes'
           });
           res.cookie('token', token, { httpOnly: true })
             .sendStatus(200);
@@ -109,8 +102,23 @@ router.post("users/authenticate", (req, res) => {
   });
 });
 
-router.get("users/checkToken", withAuth, (req, res) => {
-  res.sendStatus(200);
-})
+router.get("/users/checkToken", withAuth, (req, res) => {
+  const { email } = req; // Added by withAuth
+  User.findOne({ email })
+    .populate('house')
+    .then(({
+      name,
+      house,
+    }) => res.status(200).json({
+      email,
+      name,
+      house: house.name,
+    }))
+    .catch(err => res.status(500).send(`Error fetching user data ${err}`));
+});
+
+
+const adminRouter = require("./services/admin");
+router.use("/admin", adminRouter);
 
 module.exports = router;

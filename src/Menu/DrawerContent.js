@@ -32,12 +32,12 @@ const DrawerContent = ({ classes, onNavigate }) => {
         {
           label: "List",
           icon: ListIcon,
-          onClick: () => onClick('/list'),
+          onClick: () => onClick('/recipes'),
         },
         {
           label: "Nouveau",
           icon: PlaylistAddIcon,
-          onClick: () => onClick('/new'),
+          onClick: () => onClick('/recipes/new'),
         }
       ]
     },

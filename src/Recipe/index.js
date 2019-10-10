@@ -17,13 +17,13 @@ const Recipe = ({ id }) => {
   const formRef = React.useRef(null);
   React.useEffect(() => {
     const values = getValues();
-    if (isValid && touched.includes("dates") && values.dates && JSON.parse(values.dates).length !== recipe.dates.length) {
+    if (id !== "new" && isValid && touched.includes("dates") && values.dates && JSON.parse(values.dates).length !== recipe.dates.length) {
       const timer = setTimeout(() => {
         formRef.current.dispatchEvent(new Event('submit'));
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [isValid, touched, getValues, recipe, formRef]);
+  }, [isValid, touched, getValues, recipe, formRef, id]);
 
   const onSubmit = data => {
     onSave({
@@ -33,9 +33,10 @@ const Recipe = ({ id }) => {
       .then((res) => {
         if (id === "new") {
           const id = res.data.data._id;
-          navigate(`/${id}`);
+          navigate(`/recipes/${id}`);
         }
       })
+      .catch( err => console.error(err));
   };
   const onDelete = () => onRemove().then(() => window.history.back());
   return (

@@ -9,7 +9,6 @@ import {
   Button,
   IconButton,
   Avatar,
-  TextField
 } from "@material-ui/core";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
@@ -17,9 +16,6 @@ import { getLastDateFromNow } from "../utils/date";
 import { useStyles } from "./styles";
 import { useRecipesState } from "../contexts/recipes";
 
-import CreateIcon from "@material-ui/icons/Create";
-import SaveIcon from "@material-ui/icons/Save";
-import ClearIcon from "@material-ui/icons/Clear";
 import EditableTextField from "../EditableTextField";
 
 
@@ -84,7 +80,7 @@ function RecipeCard({ recipe, plannedDate = "", selected = false, onPick }) {
           </IconButton>
         )}
         {(isPlanned && !showNoteField) && <Button onClick={onNoteClick}>NOTE</Button>}
-        <Button component={RouterLink} to={`/${_id}`}>
+        <Button component={RouterLink} to={`/recipes/${_id}`}>
           PLUS
         </Button>
         {!!onPick && <Button onClick={() => onPick(recipe._id)}>AJOUTER</Button>}

@@ -83,7 +83,7 @@ function Planning() {
       <Container>
         {isError && "ERROR"}
         <Grid container spacing={4} direction="column" alignItems="center">
-          <Grid item spacing={2}>
+          <Grid item>
             <Button onClick={() => onPreviousClick()} color="primary" >Jours précédents</Button>
           </Grid>
           {days.map(({ date, recipes }) => (

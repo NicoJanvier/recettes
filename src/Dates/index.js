@@ -7,7 +7,7 @@ import {
   Button,
   Grid,
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+// import { makeStyles } from "@material-ui/styles";
 import AddIcon from "@material-ui/icons/Add";
 import {
   MuiPickersUtilsProvider,
@@ -15,15 +15,15 @@ import {
 } from "@material-ui/pickers";
 import DateNoteCard from "./dateNote";
 
-const useStyles = makeStyles({
-  button: {
-    // padding: "2px",
-  },
-  chip: { margin: "5px" }
-});
+// const useStyles = makeStyles({
+//   button: {
+//     // padding: "2px",
+//   },
+//   chip: { margin: "5px" }
+// });
 
 function Dates(props) {
-  const classes = useStyles();
+  // const classes = useStyles();
   const { name, value, label, register, onChange } = props;
   const [dates, setDates] = React.useState(value);
   const [pickerValue, setPickerValue] = React.useState(moment());

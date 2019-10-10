@@ -11,6 +11,7 @@ import {
 import MenuIcon from "@material-ui/icons/Menu";
 import Menu from "../Menu";
 import { useRecipesState } from "../contexts/recipes";
+import { useUserState } from "../contexts/user";
 
 const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
@@ -44,7 +45,9 @@ const useStyles = makeStyles(theme => ({
 function HeaderBar() {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { isLoading } = useRecipesState();
+  const { isLoading: recipesLoading } = useRecipesState();
+  const { isLoading: userLoading } = useUserState();
+  const isLoading = recipesLoading || userLoading;
   return (
     <Location>
       {({ location }) => (

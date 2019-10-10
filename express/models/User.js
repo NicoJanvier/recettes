@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+const ObjectId = mongoose.Schema.Types.ObjectId;
+
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  group: { type: Number, required: true },
+  name: { type: String },
+  house: { type: ObjectId, required: true, ref: 'House' },
 });
 
 UserSchema.pre('save', function(next) {
