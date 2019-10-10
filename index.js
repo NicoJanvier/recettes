@@ -4,6 +4,8 @@ const path = require("path");
 // var cors = require("cors");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
 const router = require("./express/router");
 const app = express();
 
@@ -13,6 +15,8 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(logger("dev"));
+
+app.use(cookieParser());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
