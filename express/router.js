@@ -1,7 +1,7 @@
 const express = require("express");
 // require('dotenv').config();
 const mongoose = require("mongoose");
-const withAuth = require('./middleware');
+const { withAuth, withHouse } = require('./middleware');
 
 const Recipe = require("./models/Recipes");
 const RecipeV2 = require("./models/Recipe");
@@ -20,19 +20,55 @@ db.once("open", () => console.log("connected to the database"));
 // checks if connection with the database is successful
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-
-router.get("/recipes", (req, res) => {
-  Recipe.find()
-    .select("title description url vegetarian dates")
-    .then(recipes => res.json({ success: true, data: recipes }))
+router.get("/recipes", withAuth, withHouse, (req, res) => {
+  RecipeV2.find({
+    house: req.house,
+  })
+    .then(recipes => res.status(200).json({ success: true, data: recipes }))
     .catch(err => res.json({ success: false, error: err }))
+});
+
+router.get("/recipes-last-planning", withAuth, withHouse, async (req, res) => {
+  const { house } = req;
+  const recipes = await RecipeV2
+    .find({ house })
+    .then(result => result || [])
+    .catch(() => []);
+  const plannings = await PlanningPoint
+    .find({ house })
+    .then(result => result || [])
+    .catch(() => []);
+  try {
+    const data = recipes.map(({
+      _id: recipeId,
+      title,
+      description,
+      vegetarian,
+      url,
+    }) => {
+      const sortedPlannings = plannings
+        .filter(({ recipe }) => recipeId.equals(recipe))
+        .map(({ date }) => date)
+        .sort((a, b) => a > b ? -1 : 1)
+      return {
+        title,
+        description,
+        vegetarian,
+        url,
+        last: sortedPlannings.length ? sortedPlannings[0] : "",
+      }
+    });
+    res.json({ succes: true, data });
+  } catch (error) {
+    res.status(500).send('Error retrieving recipes with plannings');
+  }
 });
 
 // Unused
 router.get("/recipes/:id", (req, res) => {
   const { id } = req.params;
-  Recipe.findById(id)
-    .select("title description url vegetarian dates")
+  RecipeV2.findById(id)
+    .populate("house")
     .then(recipe => {
       console.log('GET RECIPE', recipe);
       if (recipe) {
@@ -43,8 +79,20 @@ router.get("/recipes/:id", (req, res) => {
     .catch(err => res.json({ success: false, error: err }))
 });
 
-router.post("/recipes", withAuth, (req, res) => {
-  let recipe = new Recipe({ ...req.body });
+router.post("/recipes", withAuth, withHouse, (req, res) => {
+  const {
+    title,
+    description,
+    url,
+    vegetarian,
+  } = req.body;
+  let recipe = new Recipe({
+    title,
+    description,
+    url,
+    vegetarian,
+    house: req.house,
+  });
   try {
     recipe.save((err, result) => {
       if (err) return res.json({ success: false, error: err });
@@ -71,12 +119,49 @@ router.delete("/recipes/:id", withAuth, (req, res) => {
   });
 });
 
+router.post("/recipe/:recipe_id/planning", withAuth, withHouse, (req, res) => {
+  const { house, body: { date, note }, params: { recipe_id } } = req;
+  const planning = new PlanningPoint({
+    recipe: recipe_id,
+    house,
+    date,
+    note,
+  });
+  planning.save((err, result) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ succes: true, data: result });
+  })
+});
+
+router.get("/recipe/:recipe_id/planning", withAuth, withHouse, (req, res) => {
+  const { house, params: { recipe_id } } = req;
+  PlanningPoint.find({
+    recipe: recipe_id,
+    house,
+  })
+    .exec((err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      return res.json({ success: true, data: result })
+    });
+});
+
+router.get("/planning", withAuth, withHouse, (req, res) => {
+  PlanningPoint.find({
+    house: req.house,
+  })
+    .populate('recipe')
+    .exec((err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      return res.json({ success: true, data: result })
+    });
+});
+
+
 
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET;
 router.post("/users/authenticate", (req, res) => {
   const { email, password } = req.body;
-  console.log(`Authenticating ${email} with ${password}`);
   User.findOne({ email }, (err, user) => {
     if (err) {
       res.status(500).json({ error: 'Internal error please try again' });
@@ -109,7 +194,7 @@ router.get("/users/checkToken", withAuth, (req, res) => {
     .then(({
       name,
       house,
-    }) => res.status(200).json({
+    }) => res.json({
       email,
       name,
       house: house.name,

@@ -89,4 +89,11 @@ router.post("/house", (req, res) => {
   });
 });
 
+router.get("/recipes", (req, res) => {
+  RecipeV2.find()
+    .select("title description url vegetarian")
+    .then(recipes => res.status(200).json({ success: true, data: recipes }))
+    .catch(err => res.json({ success: false, error: err }))
+});
+
 module.exports = router;
