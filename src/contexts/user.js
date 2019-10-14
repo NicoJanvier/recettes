@@ -2,9 +2,23 @@ import React from "react";
 import axios from 'axios';
 
 const UserContext = React.createContext();
-const initialState = { isLogged: false, name: '', shouldCheck: true, isLoading: true };
+const initialState = {
+  username: '',
+  email: '',
+  house: '',
+  shouldCheck: true,
+  isLogged: false,
+  isLoading: true
+};
 function UserProvider({ children }) {
-  const [{ shouldCheck, isLogged, isLoading }, setState] = React.useState(initialState);
+  const [{
+    username,
+    email,
+    house,
+    shouldCheck,
+    isLogged,
+    isLoading,
+  }, setState] = React.useState(initialState);
 
   React.useEffect(() => {
     const isLoggedIn = async () => {
@@ -12,7 +26,14 @@ function UserProvider({ children }) {
       axios(options)
         .then(res => {
           if (res.status === 200) {
-            setState(state => ({...state, isLogged: true }));
+            const { name: username, house, email } = res.data;
+            setState(state => ({
+              ...state,
+              isLogged: true,
+              username,
+              house,
+              email,
+            }));
           } else {
             const error = new Error(res.error);
             throw error;
@@ -20,7 +41,7 @@ function UserProvider({ children }) {
         })
         .catch(err => {
           console.error(err);
-          setState(state => ({...state, isLogged: false }));
+          setState(state => ({ ...state, isLogged: false }));
         })
         .finally(() => {
           setState(state => ({ ...state, shouldCheck: false, isLoading: false }));
@@ -29,13 +50,13 @@ function UserProvider({ children }) {
     if (shouldCheck) {
       isLoggedIn();
     }
-  }, [ shouldCheck ]);
+  }, [shouldCheck]);
 
   // const checkLogStatus = () => {
   //   setState(state => ({ ...state, shouldCheck: true }));
   // };
 
-  const authenticate = ({ email, password }, onSuccess = () => {}, onFailure = () => {}) => {
+  const authenticate = ({ email, password }, onSuccess = () => { }, onFailure = () => { }) => {
     const options = {
       url: "/api/users/authenticate",
       method: "post",
@@ -47,7 +68,14 @@ function UserProvider({ children }) {
     axios(options)
       .then(res => {
         if (res.status === 200) {
-          setState(state => ({ ...state, isLogged: true }))
+          const { name: username, house, email } = res.data;
+          setState(state => ({
+            ...state,
+            isLogged: true,
+            username,
+            house,
+            email,
+          }));
           onSuccess();
         } else {
           const error = new Error(res.error);
@@ -65,9 +93,11 @@ function UserProvider({ children }) {
     <UserContext.Provider
       value={{
         isLogged,
-        // checkLogStatus,
         authenticate,
         isLoading,
+        username,
+        email,
+        house,
       }}
     >
       {children}

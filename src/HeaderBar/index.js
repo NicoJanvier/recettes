@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import Menu from "../Menu";
-import { useRecipesState } from "../contexts/recipes";
 import { useUserState } from "../contexts/user";
 
 const drawerWidth = 240;
@@ -39,15 +38,18 @@ const useStyles = makeStyles(theme => ({
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
     width: drawerWidth
-  }
+  },
+  title: {
+    flexGrow: 1,
+  },
 }));
 
-function HeaderBar() {
+function HeaderBar({ isLoading }) {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { isLoading: recipesLoading } = useRecipesState();
-  const { isLoading: userLoading } = useUserState();
-  const isLoading = recipesLoading || userLoading;
+  // const { isLoading: recipesLoading } = useRecipesState();
+  const { isLoading: userLoading, username } = useUserState();
+  // const isLoading = userLoading;
   return (
     <Location>
       {({ location }) => (
@@ -64,9 +66,10 @@ function HeaderBar() {
                 <MenuIcon />
               </IconButton>
 
-              <Typography variant="h6" component="h1" noWrap>
+              <Typography variant="h6" component="h1" noWrap className={classes.title}>
                 Mes Recettes
               </Typography>
+              {username && <Typography variant="button">{username}</Typography>}
             </Toolbar>
             {isLoading && <LinearProgress color="secondary" />}
           </AppBar>

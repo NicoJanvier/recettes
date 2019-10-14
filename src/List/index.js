@@ -7,9 +7,8 @@ import {
 
 import SearchBar from "./SearchBar";
 import RecipeCard from "../RecipeCard";
-import { compareLastDate } from "../utils/date";
-import { useRecipesState } from "../contexts/recipes";
 import { useStyles } from "./styles";
+import { useEnhancedRecipes } from "./hooks/useEnhancedRecipes";
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -28,8 +27,7 @@ function reducer(state, { type, payload }) {
 
 export default function List({ onPick }) {
   const classes = useStyles();
-  const { recipes, isError } = useRecipesState();
-
+  const { recipes, isError } = useEnhancedRecipes();
   const [state, dispatch] = React.useReducer(reducer, {
     search: '',
     veg: false,
@@ -57,9 +55,7 @@ export default function List({ onPick }) {
       return true;
     })
     .sort((a, b) => {
-      if (sortByDate) {
-        return compareLastDate(a.dates, b.dates);
-      }
+      if (sortByDate) return a.lastDate < b.lastDate ? -1 : 1;
       return null;
     });
 

@@ -6,29 +6,29 @@ import { Container, TextField, Button, InputAdornment, IconButton, FormControlLa
 import DeleteIcon from "@material-ui/icons/Delete";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import useRecipe from "./hooks/useRecipe";
-import Dates from "../Dates";
+// import Dates from "../Dates";
 
 const Recipe = ({ id }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
   const isRecipeEmpty = !recipe.title;
   const { register, errors, handleSubmit, formState, setValue, getValues } = useForm();
 
-  const { isValid, touched } = formState;
+  // const { isValid, touched } = formState;
   const formRef = React.useRef(null);
-  React.useEffect(() => {
-    const values = getValues();
-    if (id !== "new" && isValid && touched.includes("dates") && values.dates && JSON.parse(values.dates).length !== recipe.dates.length) {
-      const timer = setTimeout(() => {
-        formRef.current.dispatchEvent(new Event('submit'));
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [isValid, touched, getValues, recipe, formRef, id]);
+  // React.useEffect(() => {
+  //   const values = getValues();
+  //   if (id !== "new" && isValid && touched.includes("dates") && values.dates && JSON.parse(values.dates).length !== recipe.dates.length) {
+  //     const timer = setTimeout(() => {
+  //       formRef.current.dispatchEvent(new Event('submit'));
+  //     }, 1000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isValid, touched, getValues, recipe, formRef, id]);
 
   const onSubmit = data => {
     onSave({
       ...data,
-      dates: JSON.parse(data.dates),
+      // dates: JSON.parse(data.dates),
     })
       .then((res) => {
         if (id === "new") {
@@ -41,6 +41,7 @@ const Recipe = ({ id }) => {
   const onDelete = () => onRemove().then(() => window.history.back());
   return (
     <Container key={id}>
+      {/* <pre>{JSON.stringify(formState, null, 2)}</pre> */}
       {!(isLoading && isRecipeEmpty) &&
         <form ref={formRef} onSubmit={handleSubmit(data => onSubmit(data))}>
           <TextField
@@ -96,13 +97,13 @@ const Recipe = ({ id }) => {
             label="Végétarien"
             labelPlacement="end"
           />
-          <Dates
+          {/* <Dates
             name="dates"
             label="Dates"
             value={recipe.dates}
             register={register}
             onChange={val => setValue('dates', val)}
-          />
+          /> */}
           <Button type="submit" disabled={!formState.dirty} variant="outlined">
             Sauvegarder
         </Button>

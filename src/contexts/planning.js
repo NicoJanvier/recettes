@@ -2,22 +2,20 @@ import React from "react";
 import axios from 'axios';
 import useDataApi from "../hooks/useDataApi";
 
-const RecipesStateContext = React.createContext();
-function RecipesProvider({ children }) {
-  const api = { url: `/api/recipes`, method: "get" };
+const PlanningStateContext = React.createContext();
+function PlanningProvider({ children }) {
+  const api = { url: `/api/planning`, method: "get" };
   const [{ isLoading, isError, data }, setUrl] = useDataApi(api, []);
   const refresh = () => setUrl(api);
 
-  async function updateRecipe(recipe) {
-    const { _id: strictId, title, description, url, vegetarian } = recipe;
+  async function updatePlanningPoint(planningPoint) {
+    const { _id: strictId, date, note } = planningPoint;
     const options = {
-      url: `/api/recipes/${strictId}`,
+      url: `/api/planning/${strictId}`,
       method: "put",
       data: {
-        title,
-        description,
-        url,
-        vegetarian,
+        date,
+        note,
       }
     };
     return axios(options)
@@ -33,16 +31,15 @@ function RecipesProvider({ children }) {
       });
   };
 
-  async function createRecipe(recipe) {
-    const { title, description, url, vegetarian } = recipe;
+  async function createPlanningPoint(planningPoint) {
+    const { date, note, recipe } = planningPoint;
     const options = {
-      url: `/api/recipes`,
+      url: `/api/planning`,
       method: "post",
       data: {
-        title,
-        description,
-        vegetarian,
-        url,
+        recipe,
+        date,
+        note,
       }
     };
     return axios(options)
@@ -58,9 +55,9 @@ function RecipesProvider({ children }) {
       });
   };
 
-  async function deleteRecipe(id) {
+  async function deletePlanningPoint(id) {
     return axios({
-      url: `/api/recipes/${id}`,
+      url: `/api/planning/${id}`,
       method: "delete"
     })
       .then(r => {
@@ -76,28 +73,28 @@ function RecipesProvider({ children }) {
       });
   }
 
-  const recipes = data.data || [];
+  const planning = data.data || [];
   return (
-    <RecipesStateContext.Provider
+    <PlanningStateContext.Provider
       value={{
-        recipes,
+        planning,
         isLoading,
         isError,
-        createRecipe,
-        updateRecipe,
-        deleteRecipe
+        createPlanningPoint,
+        updatePlanningPoint,
+        deletePlanningPoint
       }}
     >
       {children}
-    </RecipesStateContext.Provider>
+    </PlanningStateContext.Provider>
   );
 }
-function useRecipesState() {
-  const context = React.useContext(RecipesStateContext);
+function usePlanningState() {
+  const context = React.useContext(PlanningStateContext);
   if (context === undefined) {
-    throw new Error("useRecipesState must be used within a RecipesProvider");
+    throw new Error("usePlanningState must be used within a PlanningProvider");
   }
   return context;
 }
-const RecipeConsumer = RecipesStateContext.Consumer;
-export { RecipesProvider, useRecipesState, RecipesStateContext, RecipeConsumer };
+const PlanningConsumer = PlanningStateContext.Consumer;
+export { PlanningProvider, usePlanningState, PlanningStateContext, PlanningConsumer };

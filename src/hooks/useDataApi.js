@@ -22,6 +22,12 @@ const dataFetchReducer = (state, action) => {
           isLoading: false,
           isError: true,
         };
+      case 'FETCH_CANCEL':
+        return {
+          ...state,
+          isLoading: false,
+          isError: false,
+        };
       default:
         throw new Error();
     }
@@ -41,17 +47,20 @@ const useDataApi = (initialUrl, initialData) => {
 
     const fetchData = async () => {
       dispatch({ type: "FETCH_INIT" });
-
-      try {
-        const result = await axios(url);
-
-        if (!didCancel) {
-          dispatch({ type: "FETCH_SUCCESS", payload: result.data });
-        }
-      } catch (error) {
-          console.log(error);
-        if (!didCancel) {
-          dispatch({ type: "FETCH_FAILURE" });
+      if(!url) {
+        dispatch({ type: "FETCH_CANCEL"});
+      } else {
+        try {
+          const result = await axios(url);
+  
+          if (!didCancel) {
+            dispatch({ type: "FETCH_SUCCESS", payload: result.data });
+          }
+        } catch (error) {
+            console.log(error);
+          if (!didCancel) {
+            dispatch({ type: "FETCH_FAILURE" });
+          }
         }
       }
     };

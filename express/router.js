@@ -3,21 +3,18 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { withAuth, withHouse } = require('./middleware');
 
-const Recipe = require("./models/Recipes");
 const RecipeV2 = require("./models/Recipe");
-const House = require("./models/House");
+// const House = require("./models/House");
 const User = require("./models/User");
 const PlanningPoint = require("./models/PlanningPoint");
 
 const router = express.Router();
 
-// this is our MongoDB database
+// DATABASE CONNECTION
 const dbRoute = process.env.DB_MONGO;
-// connects our back end code with the database
 mongoose.connect(dbRoute, { useNewUrlParser: true });
 let db = mongoose.connection;
 db.once("open", () => console.log("connected to the database"));
-// checks if connection with the database is successful
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 router.get("/recipes", withAuth, withHouse, (req, res) => {
@@ -26,42 +23,6 @@ router.get("/recipes", withAuth, withHouse, (req, res) => {
   })
     .then(recipes => res.status(200).json({ success: true, data: recipes }))
     .catch(err => res.json({ success: false, error: err }))
-});
-
-router.get("/recipes-last-planning", withAuth, withHouse, async (req, res) => {
-  const { house } = req;
-  const recipes = await RecipeV2
-    .find({ house })
-    .then(result => result || [])
-    .catch(() => []);
-  const plannings = await PlanningPoint
-    .find({ house })
-    .then(result => result || [])
-    .catch(() => []);
-  try {
-    const data = recipes.map(({
-      _id: recipeId,
-      title,
-      description,
-      vegetarian,
-      url,
-    }) => {
-      const sortedPlannings = plannings
-        .filter(({ recipe }) => recipeId.equals(recipe))
-        .map(({ date }) => date)
-        .sort((a, b) => a > b ? -1 : 1)
-      return {
-        title,
-        description,
-        vegetarian,
-        url,
-        last: sortedPlannings.length ? sortedPlannings[0] : "",
-      }
-    });
-    res.json({ succes: true, data });
-  } catch (error) {
-    res.status(500).send('Error retrieving recipes with plannings');
-  }
 });
 
 // Unused
@@ -86,7 +47,7 @@ router.post("/recipes", withAuth, withHouse, (req, res) => {
     url,
     vegetarian,
   } = req.body;
-  let recipe = new Recipe({
+  let recipe = new RecipeV2({
     title,
     description,
     url,
@@ -105,7 +66,7 @@ router.post("/recipes", withAuth, withHouse, (req, res) => {
 
 router.put("/recipes/:id", withAuth, (req, res) => {
   const { id } = req.params;
-  Recipe.findByIdAndUpdate(id, { ...req.body }, (err, data) => {
+  RecipeV2.findByIdAndUpdate(id, { ...req.body }, (err, data) => {
     if (err) return res.json({ success: false, error: err });
     return res.json({ success: true, data: data });
   });
@@ -113,12 +74,29 @@ router.put("/recipes/:id", withAuth, (req, res) => {
 
 router.delete("/recipes/:id", withAuth, (req, res) => {
   const { id } = req.params;
-  Recipe.findByIdAndRemove(id, (err, data) => {
+  RecipeV2.findByIdAndRemove(id, (err, data) => {
     if (err) return res.json({ success: false, error: err });
+    PlanningPoint.remove({ recipe: id }, (err) => {
+      if (err) console.log(`Couldn't remove PlanningPoints related to Recipe ${id}`)
+    });
     return res.json({ success: true, data: data });
   });
 });
 
+
+router.get("/recipe/:recipe_id/planning", withAuth, withHouse, (req, res) => {
+  const { house, params: { recipe_id } } = req;
+  PlanningPoint.find({
+    recipe: recipe_id,
+    house,
+  })
+    .exec((err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      return res.json({ success: true, data: result })
+    });
+});
+
+//Create on Recipe
 router.post("/recipe/:recipe_id/planning", withAuth, withHouse, (req, res) => {
   const { house, body: { date, note }, params: { recipe_id } } = req;
   const planning = new PlanningPoint({
@@ -133,16 +111,38 @@ router.post("/recipe/:recipe_id/planning", withAuth, withHouse, (req, res) => {
   })
 });
 
-router.get("/recipe/:recipe_id/planning", withAuth, withHouse, (req, res) => {
-  const { house, params: { recipe_id } } = req;
-  PlanningPoint.find({
-    recipe: recipe_id,
+//Create with recipe in body
+router.post("/planning", withAuth, withHouse, (req, res) => {
+  const { house, body: { date, note, recipe } } = req;
+  const planning = new PlanningPoint({
+    recipe,
     house,
+    date,
+    note,
+  });
+  planning.save((err, result) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ succes: true, data: result });
   })
-    .exec((err, result) => {
-      if (err) return res.status(500).json({ error: err });
-      return res.json({ success: true, data: result })
-    });
+});
+
+router.put("/planning/:id", withAuth, withHouse, (req, res) => {
+  const { body: { date, note,  }, params: { id } } = req;
+  PlanningPoint.findByIdAndUpdate(id, {
+    date,
+    note,
+  }, (err, data) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, data: data });
+  });
+});
+
+router.delete("/planning/:id", withAuth, (req, res) => {
+  const { id } = req.params;
+  PlanningPoint.findByIdAndRemove(id, (err, data) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, data: data });
+  });
 });
 
 router.get("/planning", withAuth, withHouse, (req, res) => {
@@ -162,29 +162,38 @@ const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET;
 router.post("/users/authenticate", (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email }, (err, user) => {
-    if (err) {
-      res.status(500).json({ error: 'Internal error please try again' });
-    } else if (!user) {
-      res.status(401).json({ error: 'Incorrect email or password' });
-    } else {
-      user.isCorrectPassword(password, (err, same) => {
-        if (err) {
-          res.status(500).json({ error: 'Internal error please try again' });
-        } else if (!same) {
-          res.status(401).json({ error: 'Incorrect email or password' });
-        } else {
-          // Issue token
-          const payload = { email };
-          const token = jwt.sign(payload, secret, {
-            expiresIn: '30 minutes'
-          });
-          res.cookie('token', token, { httpOnly: true })
-            .sendStatus(200);
-        }
-      });
-    }
-  });
+  User
+    .findOne({ email })
+    .populate('house')
+    .exec((err, user) => {
+      if (err) {
+        res.status(500).json({ error: 'Internal error please try again' });
+      } else if (!user) {
+        res.status(401).json({ error: 'Incorrect email or password' });
+      } else {
+        const { house, name } = user;
+        user.isCorrectPassword(password, (err, same) => {
+          if (err) {
+            res.status(500).json({ error: 'Internal error please try again' });
+          } else if (!same) {
+            res.status(401).json({ error: 'Incorrect email or password' });
+          } else {
+            // Issue token
+            const payload = { email };
+            const token = jwt.sign(payload, secret, {
+              expiresIn: '30 minutes'
+            });
+            res
+              .cookie('token', token, { httpOnly: true })
+              .json({
+                email,
+                house: house.name,
+                name,
+              });
+          }
+        });
+      }
+    });
 });
 
 router.get("/users/checkToken", withAuth, (req, res) => {

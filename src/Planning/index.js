@@ -53,12 +53,12 @@ function Planning() {
     const newDate = destination.droppableId;
     const newIndex = destination.index;
     const oldDate = source.droppableId;
-    const recipeId = draggableId.split("_")[0];
+    const planningPointId = draggableId.split("_")[0];
 
     if (newDate !== oldDate) {
       const add = { date: newDate, index: newIndex };
       const remove = { date: oldDate };
-      moveRecipe({ id: recipeId, add, remove });
+      moveRecipe({ id: planningPointId, add, remove });
     }
   };
 
@@ -70,8 +70,8 @@ function Planning() {
     setPickDate(date);
     setDialogOpen(true);
   };
-  const onPick = id => {
-    moveRecipe({ id, add: { date: pickDate } });
+  const onPick = recipe => {
+    moveRecipe({ recipe, add: { date: pickDate } });
     setDialogOpen(false);
   };
 
@@ -86,10 +86,10 @@ function Planning() {
           <Grid item>
             <Button onClick={() => onPreviousClick()} color="primary" >Jours précédents</Button>
           </Grid>
-          {days.map(({ date, recipes }) => (
+          {days.map(({ date, planningPoints }) => (
             <React.Fragment key={date}>
                 {isToday(date) && <div ref={todayRef} />}
-                {(recipes.length > 0 || editing) && (
+                {(planningPoints.length > 0 || editing) && (
                   <Grid
                     item
                     container
@@ -114,8 +114,8 @@ function Planning() {
                             className={`${classes.gridRow} 
                               ${editing ? classes.gridRowEditing : ""}`}
                           >
-                            {recipes.map((recipe, index) => {
-                              const id = `${recipe._id}_${date}_${index}`;
+                            {planningPoints.map((planningPoint, index) => {
+                              const id = `${planningPoint._id}_${date}_${index}`;
                               return (
                                 <Draggable
                                   key={id}
@@ -133,9 +133,9 @@ function Planning() {
                                         className={classes.recipeCard}
                                       >
                                         <RecipeCard
-                                          recipe={recipe}
-                                          plannedDate={date}
+                                          recipe={planningPoint.recipe}
                                           selected={isToday(date)}
+                                          planningPoint={planningPoint}
                                         />
                                         <Fab
                                           color="primary"
@@ -144,7 +144,7 @@ function Planning() {
                                           classes={{
                                             sizeSmall: classes.rmvBtnSize
                                           }}
-                                          onClick={() => onRemove(recipe._id, date)}
+                                          onClick={() => onRemove(planningPoint._id, date)}
                                           name="remove"
                                         >
                                           <ClearIcon

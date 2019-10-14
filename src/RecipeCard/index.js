@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import { Link as RouterLink } from "@reach/router";
 import {
   Typography,
@@ -12,33 +12,34 @@ import {
 } from "@material-ui/core";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
-import { getLastDateFromNow } from "../utils/date";
 import { useStyles } from "./styles";
-import { useRecipesState } from "../contexts/recipes";
+import { usePlanningState } from "../contexts/planning";
 
 import EditableTextField from "../EditableTextField";
+import { fromNow } from "../utils/date";
 
 
-function RecipeCard({ recipe, plannedDate = "", selected = false, onPick }) {
+function RecipeCard({
+    recipe,
+    planningPoint = {},
+    selected = false,
+    onPick,
+  }) {
   const classes = useStyles();
-  const { title, _id, url, vegetarian: veg, dates, description } = recipe;
-  const lastDate = getLastDateFromNow(dates.map(d => d.date));
-
-  const date = recipe.dates.find(({ date }) => date === plannedDate);
-  const savedNote = (date && date.note) || "";
+  const { title, _id, url, vegetarian: veg, description } = recipe;
+  const savedNote = planningPoint.note || "";
   const [note, setNote] = React.useState(savedNote);
-  const { updateRecipe } = useRecipesState();
+  const { updatePlanningPoint } = usePlanningState();
   const onChange = event => {
     const { value } = event.target;
     setNote(value);
   }
   const onSave = () => {
-    date.note = note;
-    updateRecipe({ ...recipe });
+    updatePlanningPoint({ ...planningPoint, note });
   }
 
-  const isPlanned = plannedDate !== "";
-  const [showNoteField, setShowNoteField] = React.useState(isPlanned && savedNote !== "");
+  const isPlanned = !!planningPoint.date;
+  const [showNoteField, setShowNoteField] = React.useState(planningPoint.date && savedNote !== "");
   const onNoteClick = () => {
     if(showNoteField) return
     setShowNoteField(true);
@@ -49,9 +50,9 @@ function RecipeCard({ recipe, plannedDate = "", selected = false, onPick }) {
         <Typography variant="h6" component="h2">
           {title}
         </Typography>
-        {lastDate && !isPlanned && (
+        {recipe.lastDate && (
           <Typography component="span">
-            <i>{lastDate}</i>
+            <i>{fromNow(recipe.lastDate)}</i>
           </Typography>
         )}
         {description && (<Typography>{description}</Typography>)}
@@ -83,16 +84,16 @@ function RecipeCard({ recipe, plannedDate = "", selected = false, onPick }) {
         <Button component={RouterLink} to={`/recipes/${_id}`}>
           PLUS
         </Button>
-        {!!onPick && <Button onClick={() => onPick(recipe._id)}>AJOUTER</Button>}
+        {!!onPick && <Button onClick={() => onPick(recipe)}>AJOUTER</Button>}
       </CardActions>
     </Card>
   );
 }
 
-RecipeCard.propTypes = {
-  recipe: PropTypes.shape({
-    title: PropTypes.string.isRequired
-  }).isRequired
-};
+// RecipeCard.propTypes = {
+//   recipe: PropTypes.shape({
+//     title: PropTypes.string.isRequired
+//   }).isRequired
+// };
 
 export default RecipeCard;

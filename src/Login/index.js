@@ -9,13 +9,18 @@ const Login = () => {
   const { register, errors, handleSubmit, formState } = useForm();
   const { authenticate, isLoading } = useUserState();
 
-  const onSubmit = ({ username: email, password}) => {
+  const onSubmit = ({ username: email, password }) => {
     authenticate({ email, password });
   }
   if (isLoading) return null;
   return (
     <Container>
-      <pre>{JSON.stringify({"email": "me@example.com", "password": "mypassword"}, null, 2)}</pre>
+      <pre>{JSON.stringify({
+        "house": "NicoCam",
+        "email": "janvier.nico@gmail.com",
+        "password": "SS8ir3recettes",
+        "name": "Nico"
+      }, null, 2)}</pre>
       <form onSubmit={handleSubmit(data => onSubmit(data))} autoComplete="on" >
         <TextField
           name="username"
