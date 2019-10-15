@@ -31,7 +31,6 @@ router.get("/recipes/:id", (req, res) => {
   RecipeV2.findById(id)
     .populate("house")
     .then(recipe => {
-      console.log('GET RECIPE', recipe);
       if (recipe) {
         res.json({ success: true, data: recipe })
       }
@@ -181,7 +180,7 @@ router.post("/users/authenticate", (req, res) => {
             // Issue token
             const payload = { email };
             const token = jwt.sign(payload, secret, {
-              expiresIn: '30 minutes'
+              expiresIn: '30 days'
             });
             res
               .cookie('token', token, { httpOnly: true })
