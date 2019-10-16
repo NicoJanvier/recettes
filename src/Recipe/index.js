@@ -6,10 +6,13 @@ import { Container, TextField, Button, InputAdornment, IconButton, FormControlLa
 import DeleteIcon from "@material-ui/icons/Delete";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import useRecipe from "./hooks/useRecipe";
+import { useUserState } from "../contexts/user";
 // import Dates from "../Dates";
 
 const Recipe = ({ id }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
+  const { house } = useUserState();
+  const canModify = recipe.house === house.id;
   const isRecipeEmpty = !recipe.title;
   const { register, errors, handleSubmit, formState, setValue, getValues } = useForm();
 
@@ -36,12 +39,11 @@ const Recipe = ({ id }) => {
           navigate(`/recipes/${id}`);
         }
       })
-      .catch( err => console.error(err));
+      .catch(err => console.error(err));
   };
   const onDelete = () => onRemove().then(() => window.history.back());
   return (
     <Container key={id}>
-      {/* <pre>{JSON.stringify(formState, null, 2)}</pre> */}
       {!(isLoading && isRecipeEmpty) &&
         <form ref={formRef} onSubmit={handleSubmit(data => onSubmit(data))}>
           <TextField
@@ -51,6 +53,7 @@ const Recipe = ({ id }) => {
             inputRef={register({ required: true })}
             error={!!errors.title}
             defaultValue={recipe.title}
+            inputProps={{ readOnly: !canModify }}
           />
           <TextField
             name="description"
@@ -60,6 +63,7 @@ const Recipe = ({ id }) => {
             fullWidth
             inputRef={register}
             defaultValue={recipe.description}
+            inputProps={{ readOnly: !canModify }}
           />
           <TextField
             label="Lien"
@@ -68,6 +72,8 @@ const Recipe = ({ id }) => {
             defaultValue={recipe.url}
             fullWidth
             inputRef={register}
+            inputProps={{ readOnly: !canModify }}
+            // eslint-disable-next-line react/jsx-no-duplicate-props
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -104,13 +110,20 @@ const Recipe = ({ id }) => {
             register={register}
             onChange={val => setValue('dates', val)}
           /> */}
-          <Button type="submit" disabled={!formState.dirty} variant="outlined">
-            Sauvegarder
-        </Button>
-          {(id !== "new") &&
+          {canModify &&
+            <Button
+              type="submit"
+              disabled={!formState.dirty}
+              variant="outlined"
+            >
+              Sauvegarder
+            </Button>
+          }
+          {(id !== "new") && canModify &&
             <Button onClick={() => onDelete().then(() => window.history.back())} variant="contained">
               <DeleteIcon /> Supprimer
-            </Button>}
+            </Button>
+          }
         </form>}
     </Container>
   );

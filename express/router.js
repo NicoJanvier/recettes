@@ -17,10 +17,8 @@ let db = mongoose.connection;
 db.once("open", () => console.log("connected to the database"));
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-router.get("/recipes", withAuth, withHouse, (req, res) => {
-  RecipeV2.find({
-    house: req.house,
-  })
+router.get("/recipes", withAuth, (req, res) => {
+  RecipeV2.find()
     .then(recipes => res.status(200).json({ success: true, data: recipes }))
     .catch(err => res.json({ success: false, error: err }))
 });
@@ -205,7 +203,10 @@ router.get("/users/checkToken", withAuth, (req, res) => {
     }) => res.json({
       email,
       name,
-      house: house.name,
+      house: {
+        id: house._id,
+        name: house.name,
+      },
     }))
     .catch(err => res.status(500).send(`Error fetching user data ${err}`));
 });

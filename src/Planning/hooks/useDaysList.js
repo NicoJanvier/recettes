@@ -3,14 +3,11 @@ import { usePlanningState } from "../../contexts/planning";
 import { generateDateList } from "../../utils/date";
 
 function getDays(planning, offset) {
-  if (planning.length > 0) {
-    const days = generateDateList(offset).map(date => ({
-      date,
-      planningPoints: planning.filter(dateObj => dateObj.date === date)
-    }));
-    return days
-  }
-  return []
+  const days = generateDateList(offset).map(date => ({
+    date,
+    planningPoints: planning.filter(dateObj => dateObj.date === date)
+  }));
+  return days
 }
 
 function reducer(state, { type, payload }) {
@@ -18,7 +15,7 @@ function reducer(state, { type, payload }) {
   let offset;
   switch (type) {
     case 'fromRecipes':
-      if (payload.planning.length === 0) return state;
+      if (payload.isLoading || payload.isError) return state;
       days = getDays(payload.planning, state.offset);
       return { ...state, days }
     case 'addDays':
@@ -47,19 +44,20 @@ function reducer(state, { type, payload }) {
 function useDaysList() {
   const {
     planning,
+    isLoading,
     isError,
     updatePlanningPoint,
     createPlanningPoint,
     deletePlanningPoint,
   } = usePlanningState();
-  
+
   const [{ days }, dispatch] = React.useReducer(reducer, { days: [], offset: 0 });
 
   const addDays = () => dispatch({ type: 'addDays', payload: { planning } });
 
   React.useEffect(() => {
     dispatch({ type: 'fromRecipes', payload: { planning } })
-  }, [planning]);
+  }, [planning, isLoading, isError]);
 
   const moveRecipe = ({ id, add, remove, recipe }) => {
     let planningPoint;
@@ -80,6 +78,6 @@ function useDaysList() {
   }
 
   return { days, addDays, isError, moveRecipe };
-  }
+}
 
-  export { useDaysList };
+export { useDaysList };
