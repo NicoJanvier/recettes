@@ -12,7 +12,7 @@ import { useUserState } from "../contexts/user";
 const Recipe = ({ id }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
   const { house } = useUserState();
-  const canModify = recipe.house === house.id;
+  const canModify = id === 'new' || recipe.house === house.id;
   const isRecipeEmpty = !recipe.title;
   const { register, errors, handleSubmit, formState, setValue, getValues } = useForm();
 
