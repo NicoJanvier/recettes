@@ -46,7 +46,7 @@ const SearchBar = ({
                 )}
               <StyledDivider />
               <IconButton onClick={() => dispatch({ type: 'TOGGLE_VEG' })}>
-                <VegAvatar on={veg}>V</VegAvatar>
+                <VegAvatar on={veg ? veg : null}>V</VegAvatar>
               </IconButton>
               <IconButton onClick={() => dispatch({ type: 'TOGGLE_SORT_BY_DATE' })}>
                 <StyledSortIcon />
@@ -60,7 +60,6 @@ const SearchBar = ({
 }
 
 SearchBar.propTypes = {
-  classes: PropTypes.object.isRequired,
   search: PropTypes.string.isRequired,
   veg: PropTypes.bool.isRequired,
   sortByDate: PropTypes.bool.isRequired,

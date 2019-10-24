@@ -1,9 +1,10 @@
+import React from 'react'
 import styled from 'styled-components';
 import { AppBar, IconButton, Typography } from '@material-ui/core';
 
 const drawerWidth = "240px";
 
-const StyledAppBar = styled(AppBar)`
+const StyledAppBar = styled(({ showMenu, ...props }) => <AppBar {...props}/> )`
   position: fixed;
   margin-left: ${drawerWidth};
   ${({ theme }) => theme.breakpoints.up("sm")} {

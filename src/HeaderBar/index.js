@@ -14,21 +14,20 @@ import {
   Title,
 } from './index.style'
 
-function HeaderBar({ isLoading }) {
+function HeaderBar({ isLoading, hideMenu }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { username, isLogged } = useUserState();
+  const { username } = useUserState();
   return (
     <Location>
       {({ location }) => (
         <React.Fragment>
-          <StyledAppBar showMenu={isLogged}>
+          <StyledAppBar showMenu={!hideMenu}>
             <Toolbar>
-              {isLogged &&
+              {!hideMenu &&
                 <MenuButton
                   aria-label="Open drawer"
                   edge="start"
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  disabled={!isLogged}
                 >
                   <MenuIcon />
                 </MenuButton>
@@ -40,7 +39,7 @@ function HeaderBar({ isLoading }) {
             </Toolbar>
             {isLoading && <LinearProgress color="secondary" />}
           </StyledAppBar>
-          {isLogged &&
+          {!hideMenu &&
             <Menu
               mobileOpen={mobileOpen}
               setMobileOpen={setMobileOpen}

@@ -21,10 +21,11 @@ const StyledBox = styled(Box)`
 `
 const Routes = () => {
   const { isLogged, isLoading: isUserLoading } = useUserState();
+  if (isUserLoading) return <HeaderBar isLoading hideMenu />
   return (
     !isLogged ? (
       <>
-        <HeaderBar isLoading={isUserLoading} />
+        <HeaderBar isLoading={isUserLoading} hideMenu />
         <StyledBox>
           <Router>
             <Login path="/login" />
@@ -47,6 +48,7 @@ const Routes = () => {
                           <List path="/recipes" />
                           <Planning path="/planning" />
                           <Redirect from="/login" to="/planning" noThrow />
+                          <Redirect from="/" to="/planning" noThrow />
                         </Router>
                       </StyledBox>
                     </>

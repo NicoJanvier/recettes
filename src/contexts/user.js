@@ -7,7 +7,7 @@ const initialState = {
   email: '',
   house: '',
   shouldCheck: true,
-  isLogged: false,
+  isLogged: true,
   isLoading: true
 };
 function UserProvider({ children }) {
