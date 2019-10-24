@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { TextField, IconButton } from '@material-ui/core';
+import { TextField } from '@material-ui/core';
 import CreateIcon from "@material-ui/icons/Create";
 import SaveIcon from "@material-ui/icons/Save";
 import ClearIcon from "@material-ui/icons/Clear";
 
-import { useStyles } from "./styles";
+import { ActionButton } from './index.style';
 
 const EditableTextField = ({ value, hasChanged, name, onChange, onSave, onClear, ...textFieldProps }) => {
-  const classes = useStyles();
-
   return (
     <TextField
       value={value}
@@ -19,17 +17,17 @@ const EditableTextField = ({ value, hasChanged, name, onChange, onSave, onClear,
         endAdornment:
           <>
             {hasChanged && (
-              <IconButton onClick={onSave} className={classes.actionButtons}>
+              <ActionButton onClick={onSave}>
                 <SaveIcon />
-              </IconButton>
+              </ActionButton>
             )}
             {value && (
-              <IconButton onClick={onClear} className={classes.actionButtons}>
+              <ActionButton onClick={onClear}>
                 <ClearIcon />
-              </IconButton>
+              </ActionButton>
             )}
             {(!value && !hasChanged) && (
-              <CreateIcon className={classes.editIcon} />
+              <CreateIcon/>
             )}
           </>
       }}

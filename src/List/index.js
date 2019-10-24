@@ -7,8 +7,8 @@ import {
 
 import SearchBar from "./SearchBar";
 import RecipeCard from "../RecipeCard";
-import { useStyles } from "./styles";
 import { useEnhancedRecipes } from "./hooks/useEnhancedRecipes";
+import { GridContainer } from './index.style'
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -26,7 +26,6 @@ function reducer(state, { type, payload }) {
 };
 
 export default function List({ onPick }) {
-  const classes = useStyles();
   const { recipes, isError } = useEnhancedRecipes();
   const [state, dispatch] = React.useReducer(reducer, {
     search: '',
@@ -61,16 +60,16 @@ export default function List({ onPick }) {
 
   return (
     <>
-      <SearchBar classes={classes} dispatch={dispatch} {...state} />
+      <SearchBar dispatch={dispatch} {...state} />
       <Container>
         {isError && "Une erreur est apparue."}
-        <Grid container spacing={2} className={classes.gridContainer}>
+        <GridContainer container spacing={2}>
           {listRecipes.map(recipe => (
             <Grid item xs={12} key={recipe._id}>
               <RecipeCard recipe={recipe} onPick={onPick} />
             </Grid>
           ))}
-        </Grid>
+        </GridContainer>
       </Container>
     </>
   );

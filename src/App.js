@@ -1,37 +1,21 @@
 import React from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { ThemeProvider } from '@material-ui/styles';
-import { makeStyles, createMuiTheme } from "@material-ui/core/styles";
-import { amber } from '@material-ui/core/colors';
+import styled from 'styled-components';
 
 import { UserProvider } from "./contexts/user";
 
 import Routes from "./Routes";
+import ThemeProvider from "./contexts/theme";
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#388e3c',
-    },
-    secondary: amber,
-  },
-});
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex"
-  },
-}));
-
+const Flex = styled.div`display: flex;`
 export default function App() {
-  const classes = useStyles();
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <UserProvider>
-        <div className={classes.root}>
+        <Flex>
           <CssBaseline />
           <Routes />
-        </div>
+        </Flex>
       </UserProvider>
     </ThemeProvider>
   );

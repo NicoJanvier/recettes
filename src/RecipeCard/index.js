@@ -3,21 +3,17 @@ import React from "react";
 import { Link as RouterLink } from "@reach/router";
 import {
   Typography,
-  Card,
   CardContent,
-  CardActions,
   Button,
   IconButton,
-  Avatar,
 } from "@material-ui/core";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
-import { useStyles } from "./styles";
 import { usePlanningState } from "../contexts/planning";
 
 import EditableTextField from "../EditableTextField";
 import { fromNow } from "../utils/date";
-
+import { Wrapper, CardActionsWrapper, AvatarWrapper } from './index.style';
 
 function RecipeCard({
     recipe,
@@ -25,7 +21,6 @@ function RecipeCard({
     selected = false,
     onPick,
   }) {
-  const classes = useStyles();
   const { title, _id, url, vegetarian: veg, description } = recipe;
   const savedNote = planningPoint.note || "";
   const [note, setNote] = React.useState(savedNote);
@@ -45,7 +40,7 @@ function RecipeCard({
     setShowNoteField(true);
   }
   return (
-    <Card className={selected ? classes.selectedCard : ""}>
+    <Wrapper selected={selected}>
       <CardContent>
         <Typography variant="h6" component="h2">
           {title}
@@ -69,8 +64,8 @@ function RecipeCard({
           />
         )}
       </CardContent>
-      <CardActions className={classes.cardAction}>
-        {veg && <Avatar className={classes.avatar}>V</Avatar>}
+      <CardActionsWrapper>
+        {veg && <AvatarWrapper>V</AvatarWrapper>}
         {url && (
           <IconButton
             href={url}
@@ -85,15 +80,9 @@ function RecipeCard({
           PLUS
         </Button>
         {!!onPick && <Button onClick={() => onPick(recipe)}>AJOUTER</Button>}
-      </CardActions>
-    </Card>
+      </CardActionsWrapper>
+    </Wrapper>
   );
 }
-
-// RecipeCard.propTypes = {
-//   recipe: PropTypes.shape({
-//     title: PropTypes.string.isRequired
-//   }).isRequired
-// };
 
 export default RecipeCard;

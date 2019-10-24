@@ -2,11 +2,8 @@ import React from "react";
 import {
   Grid,
   Container,
-  Typography,
   IconButton,
   Button,
-  Fab,
-  Dialog,
   DialogContent,
   DialogActions
 } from "@material-ui/core";
@@ -23,15 +20,20 @@ import { formatToDay, formatToDayOfWeek, isToday } from "../utils/date";
 import RecipeCard from "../RecipeCard";
 import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
-import { useStyles } from "./styles";
 import { useDaysList } from "./hooks/useDaysList";
 
-function Planning() {
-  const classes = useStyles();
-  const { days, addDays, isError, moveRecipe } = useDaysList();
 
-  // const [editing, setEditing] = React.useState(true);
-  const editing = true;
+import {
+  GridRow,
+  DateText,
+  AddBtnCard,
+  RecipeCardWrapper,
+  RemoveButton,
+  DialogWrapper,
+} from "./index.style";
+
+function Planning() {
+  const { days, addDays, isError, moveRecipe } = useDaysList();
 
   // Scrolling
   const todayRef = React.useRef(null);
@@ -88,110 +90,97 @@ function Planning() {
           </Grid>
           {days.map(({ date, planningPoints }) => (
             <React.Fragment key={date}>
-                {isToday(date) && <div ref={todayRef} />}
-                {(planningPoints.length > 0 || editing) && (
-                  <Grid
-                    item
-                    container
-                    spacing={2}
-                    id={date}
-                    ref={topRefDate === date ? topRef : null}
-                  >
-                    <Grid item className={classes.gridItemDate}>
-                      <Typography className={classes.dateText}>
-                        {formatToDayOfWeek(date)}
-                      </Typography>
-                      <Typography className={classes.dateText}>
-                        {formatToDay(date)}
-                      </Typography>
-                    </Grid>
-                    <Droppable droppableId={date}>
-                      {provided => (
-                        <RootRef rootRef={provided.innerRef}>
-                          <Grid
-                            item
-                            container
-                            className={`${classes.gridRow} 
-                              ${editing ? classes.gridRowEditing : ""}`}
-                          >
-                            {planningPoints.map((planningPoint, index) => {
-                              const id = `${planningPoint._id}_${date}_${index}`;
-                              return (
-                                <Draggable
-                                  key={id}
-                                  index={index}
-                                  draggableId={id}
-                                  isDragDisabled={!editing}
-                                >
-                                  {provided => (
-                                    <RootRef rootRef={provided.innerRef}>
-                                      <Grid
-                                        item
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        style={provided.draggableProps.style}
-                                        className={classes.recipeCard}
-                                      >
-                                        <RecipeCard
-                                          recipe={planningPoint.recipe}
-                                          selected={isToday(date)}
-                                          planningPoint={planningPoint}
-                                        />
-                                        <Fab
-                                          color="primary"
-                                          size="small"
-                                          className={classes.rmvBtn}
-                                          classes={{
-                                            sizeSmall: classes.rmvBtnSize
-                                          }}
-                                          onClick={() => onRemove(planningPoint._id, date)}
-                                          name="remove"
-                                        >
-                                          <ClearIcon
-                                            className={classes.rmvIcon}
-                                          />
-                                        </Fab>
-                                      </Grid>
-                                    </RootRef>
-                                  )}
-                                </Draggable>
-                              );
-                            })}
-                            {editing && (
-                              <Grid item xs={12} className={classes.addBtnCard}>
-                                <IconButton
-                                  color="primary"
-                                  onClick={() => onClickPick(date)}
-                                >
-                                  <AddIcon />
-                                </IconButton>
-                              </Grid>
-                            )}
-                            {provided.placeholder}
-                          </Grid>
-                        </RootRef>
-                      )}
-                    </Droppable>
+              {isToday(date) && <div ref={todayRef} />}
+              {(planningPoints.length > 0) && (
+                <Grid
+                  item
+                  container
+                  spacing={2}
+                  id={date}
+                  ref={topRefDate === date ? topRef : null}
+                >
+                  <Grid item>
+                    <DateText>
+                      {formatToDayOfWeek(date)}
+                    </DateText>
+                    <DateText>
+                      {formatToDay(date)}
+                    </DateText>
                   </Grid>
-                )}
-              </React.Fragment>
+                  <Droppable droppableId={date}>
+                    {provided => (
+                      <RootRef rootRef={provided.innerRef}>
+                        <GridRow
+                          item
+                          container
+                        >
+                          {planningPoints.map((planningPoint, index) => {
+                            const id = `${planningPoint._id}_${date}_${index}`;
+                            return (
+                              <Draggable
+                                key={id}
+                                index={index}
+                                draggableId={id}
+                              >
+                                {provided => (
+                                  <RootRef rootRef={provided.innerRef}>
+                                    <RecipeCardWrapper
+                                      item
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      style={provided.draggableProps.style}
+                                    >
+                                      <RecipeCard
+                                        recipe={planningPoint.recipe}
+                                        selected={isToday(date)}
+                                        planningPoint={planningPoint}
+                                      />
+                                      <RemoveButton
+                                        color="primary"
+                                        size="small"
+                                        onClick={() => onRemove(planningPoint._id, date)}
+                                        name="remove"
+                                      >
+                                        <ClearIcon />
+                                      </RemoveButton>
+                                    </RecipeCardWrapper>
+                                  </RootRef>
+                                )}
+                              </Draggable>
+                            );
+                          })}
+                          <AddBtnCard item xs={12}>
+                            <IconButton
+                              color="primary"
+                              onClick={() => onClickPick(date)}
+                            >
+                              <AddIcon />
+                            </IconButton>
+                          </AddBtnCard>
+                          {provided.placeholder}
+                        </GridRow>
+                      </RootRef>
+                    )}
+                  </Droppable>
+                </Grid>
+              )}
+            </React.Fragment>
           ))}
         </Grid>
-        <Dialog
+        <DialogWrapper
           open={isDialogOpen}
           onClose={() => setDialogOpen(false)}
-          classes={{ paper: classes.dialog }}
+          classes={{ paper: "paper" }}
           fullScreen={fullScreen}
           maxWidth="sm"
           fullWidth
           scroll="paper"
-          aria-labelledby="responsive-dialog-title"
         >
           <DialogContent
             dividers
             classes={{
-              root: classes.dialogContent,
-              dividers: classes.dialogDividers
+              root: "content",
+              dividers: "dividers"
             }}
           >
             <List onPick={onPick} />
@@ -201,28 +190,8 @@ function Planning() {
               Close
             </Button>
           </DialogActions>
-        </Dialog>
+        </DialogWrapper>
       </Container>
-      {/* {days.length > 0 && (
-        <div className={classes.fabBox}>
-          <Fab
-            color="primary"
-            className={classes.fab}
-            onClick={() => setEditing(!editing)}
-            size="medium"
-          >
-            <AddIcon />
-          </Fab>
-          <Fab
-            color="secondary"
-            className={classes.fab}
-            onClick={() => executeScroll()}
-            size="small"
-          >
-            <DateRangeIcon />
-          </Fab>
-        </div>
-      )} */}
     </DragDropContext>
   );
 }

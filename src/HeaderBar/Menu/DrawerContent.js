@@ -15,7 +15,9 @@ import ListIcon from "@material-ui/icons/List";
 import Toys from "@material-ui/icons/Toys";
 import GoogleIcon from "./logo/GoogleIcon";
 
-const DrawerContent = ({ classes, onNavigate }) => {
+import { ToolbarPlaceholder } from '../index.style'
+
+const DrawerContent = ({ onNavigate }) => {
   const onClick = path => {
     onNavigate();
     navigate(path);
@@ -66,7 +68,7 @@ const DrawerContent = ({ classes, onNavigate }) => {
   ];
   return (
     <div>
-      <div className={classes.toolbar} />
+      <ToolbarPlaceholder />
       {navItems.map(({ title, nav, key }) => (
         <React.Fragment key={key}>
           <Divider />

@@ -15,7 +15,7 @@ const Login = () => {
   if (isLoading) return null;
   return (
     <Container>
-      <form onSubmit={handleSubmit(data => onSubmit(data))} autoComplete="on" >
+      <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" >
         <TextField
           name="username"
           type="email"
