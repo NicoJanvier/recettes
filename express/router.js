@@ -184,7 +184,10 @@ router.post("/users/authenticate", (req, res) => {
               .cookie('token', token, { httpOnly: true })
               .json({
                 email,
-                house: house.name,
+                house: {
+                  id: house._id,
+                  name: house.name,
+                },
                 name,
               });
           }

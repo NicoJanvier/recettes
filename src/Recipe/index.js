@@ -18,17 +18,30 @@ import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import useRecipe from "./hooks/useRecipe";
 import { useUserState } from "../contexts/user";
 
-const Buttons = styled(Grid)`
-  display: flex;
-  justify-content: flex-end;
-  > button + button {
-    margin-left: ${({ theme }) => theme.spacing(2)}px;
-  }
-`
 const Paper = styled(Grid)`
   margin-top: ${({ theme }) => theme.spacing(3)}px;
 `
-
+const Buttons = styled(Grid)`
+  display: flex;
+  flex-direction: column;
+  > button {
+    flex-basis: 100%;
+    & + button {
+      margin-top: ${({ theme }) => theme.spacing(2)}px;
+    }
+  }
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    flex-direction: row;
+    justify-content: flex-end;
+    > button {
+      flex-basis: auto;
+      & + button {
+        margin-top: 0;
+        margin-left: ${({ theme }) => theme.spacing(2)}px;
+      }
+    }
+  }
+`
 const Recipe = ({ id }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
   const { house } = useUserState();
@@ -61,7 +74,9 @@ const Recipe = ({ id }) => {
           <Grid item xs={12}>
             <TextField
               name="title"
-              label="Titre *"
+              label="Titre"
+              required
+              multiline
               fullWidth
               inputRef={register({ required: true })}
               error={!!errors.title}
@@ -73,7 +88,6 @@ const Recipe = ({ id }) => {
             <TextField
               name="description"
               label="Description"
-              type="textarea"
               multiline
               fullWidth
               inputRef={register}
@@ -133,7 +147,7 @@ const Recipe = ({ id }) => {
                 startIcon={<SaveIcon />}
               >
                 Sauvegarder
-            </Button>
+                </Button>
             }
             {(id !== "new") && canModify &&
               <Button
@@ -142,7 +156,7 @@ const Recipe = ({ id }) => {
                 startIcon={<DeleteIcon />}
               >
                 Supprimer
-            </Button>
+                </Button>
             }
           </Buttons>
         </Paper>}
