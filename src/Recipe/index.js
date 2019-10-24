@@ -25,6 +25,9 @@ const Buttons = styled(Grid)`
     margin-left: ${({ theme }) => theme.spacing(2)}px;
   }
 `
+const Paper = styled(Grid)`
+  margin-top: ${({ theme }) => theme.spacing(3)}px;
+`
 
 const Recipe = ({ id }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
@@ -49,7 +52,7 @@ const Recipe = ({ id }) => {
   return (
     <Container key={id}>
       {!(isLoading && isRecipeEmpty) &&
-        <Grid
+        <Paper
           container
           spacing={2}
           component="form"
@@ -142,7 +145,7 @@ const Recipe = ({ id }) => {
             </Button>
             }
           </Buttons>
-        </Grid>}
+        </Paper>}
     </Container>
   );
 };
