@@ -79,7 +79,6 @@ function Planning() {
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Container>
@@ -91,79 +90,77 @@ function Planning() {
           {days.map(({ date, planningPoints }) => (
             <React.Fragment key={date}>
               {isToday(date) && <div ref={todayRef} />}
-              {(planningPoints.length > 0) && (
-                <Grid
-                  item
-                  container
-                  spacing={2}
-                  id={date}
-                  ref={topRefDate === date ? topRef : null}
-                >
-                  <Grid item>
-                    <DateText>
-                      {formatToDayOfWeek(date)}
-                    </DateText>
-                    <DateText>
-                      {formatToDay(date)}
-                    </DateText>
-                  </Grid>
-                  <Droppable droppableId={date}>
-                    {provided => (
-                      <RootRef rootRef={provided.innerRef}>
-                        <GridRow
-                          item
-                          container
-                        >
-                          {planningPoints.map((planningPoint, index) => {
-                            const id = `${planningPoint._id}_${date}_${index}`;
-                            return (
-                              <Draggable
-                                key={id}
-                                index={index}
-                                draggableId={id}
-                              >
-                                {provided => (
-                                  <RootRef rootRef={provided.innerRef}>
-                                    <RecipeCardWrapper
-                                      item
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      style={provided.draggableProps.style}
-                                    >
-                                      <RecipeCard
-                                        recipe={planningPoint.recipe}
-                                        selected={isToday(date)}
-                                        planningPoint={planningPoint}
-                                      />
-                                      <RemoveButton
-                                        color="primary"
-                                        size="small"
-                                        onClick={() => onRemove(planningPoint._id, date)}
-                                        name="remove"
-                                      >
-                                        <ClearIcon />
-                                      </RemoveButton>
-                                    </RecipeCardWrapper>
-                                  </RootRef>
-                                )}
-                              </Draggable>
-                            );
-                          })}
-                          <AddBtnCard item xs={12}>
-                            <IconButton
-                              color="primary"
-                              onClick={() => onClickPick(date)}
-                            >
-                              <AddIcon />
-                            </IconButton>
-                          </AddBtnCard>
-                          {provided.placeholder}
-                        </GridRow>
-                      </RootRef>
-                    )}
-                  </Droppable>
+              <Grid
+                item
+                container
+                spacing={2}
+                id={date}
+                ref={topRefDate === date ? topRef : null}
+              >
+                <Grid item>
+                  <DateText>
+                    {formatToDayOfWeek(date)}
+                  </DateText>
+                  <DateText>
+                    {formatToDay(date)}
+                  </DateText>
                 </Grid>
-              )}
+                <Droppable droppableId={date}>
+                  {provided => (
+                    <RootRef rootRef={provided.innerRef}>
+                      <GridRow
+                        item
+                        container
+                      >
+                        {planningPoints.map((planningPoint, index) => {
+                          const id = `${planningPoint._id}_${date}_${index}`;
+                          return (
+                            <Draggable
+                              key={id}
+                              index={index}
+                              draggableId={id}
+                            >
+                              {provided => (
+                                <RootRef rootRef={provided.innerRef}>
+                                  <RecipeCardWrapper
+                                    item
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={provided.draggableProps.style}
+                                  >
+                                    <RecipeCard
+                                      recipe={planningPoint.recipe}
+                                      selected={isToday(date)}
+                                      planningPoint={planningPoint}
+                                    />
+                                    <RemoveButton
+                                      color="primary"
+                                      size="small"
+                                      onClick={() => onRemove(planningPoint._id, date)}
+                                      name="remove"
+                                    >
+                                      <ClearIcon />
+                                    </RemoveButton>
+                                  </RecipeCardWrapper>
+                                </RootRef>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                        <AddBtnCard item xs={12}>
+                          <IconButton
+                            color="primary"
+                            onClick={() => onClickPick(date)}
+                          >
+                            <AddIcon />
+                          </IconButton>
+                        </AddBtnCard>
+                        {provided.placeholder}
+                      </GridRow>
+                    </RootRef>
+                  )}
+                </Droppable>
+              </Grid>
             </React.Fragment>
           ))}
         </Grid>
