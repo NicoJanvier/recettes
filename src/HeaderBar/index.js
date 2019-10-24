@@ -16,21 +16,23 @@ import {
 
 function HeaderBar({ isLoading }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { username } = useUserState();
+  const { username, isLogged } = useUserState();
   return (
     <Location>
       {({ location }) => (
         <React.Fragment>
-          <StyledAppBar>
+          <StyledAppBar showMenu={isLogged}>
             <Toolbar>
-              <MenuButton
-                aria-label="Open drawer"
-                edge="start"
-                onClick={() => setMobileOpen(!mobileOpen)}
-              >
-                <MenuIcon />
-              </MenuButton>
-
+              {isLogged &&
+                <MenuButton
+                  aria-label="Open drawer"
+                  edge="start"
+                  onClick={() => setMobileOpen(!mobileOpen)}
+                  disabled={!isLogged}
+                >
+                  <MenuIcon />
+                </MenuButton>
+              }
               <Title variant="h6" component="h1" noWrap>
                 Mes Recettes
               </Title>
@@ -38,10 +40,12 @@ function HeaderBar({ isLoading }) {
             </Toolbar>
             {isLoading && <LinearProgress color="secondary" />}
           </StyledAppBar>
-          <Menu
-            mobileOpen={mobileOpen}
-            setMobileOpen={setMobileOpen}
-          />
+          {isLogged &&
+            <Menu
+              mobileOpen={mobileOpen}
+              setMobileOpen={setMobileOpen}
+            />
+          }
         </React.Fragment>
       )}
     </Location>

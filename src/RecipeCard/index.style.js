@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Card, CardActions, Avatar } from '@material-ui/core';
 import { green } from "@material-ui/core/colors";
 
-const Wrapper = styled(Card)`
+const CardWrapper = styled(Card)`
   background-color: ${({ selected }) => selected ? green[200] : null };
 `
 
@@ -20,4 +20,4 @@ const AvatarWrapper = styled(Avatar)`
   margin-left: ${({ theme }) => theme.spacing(1)}px;
 `
 
-export { Wrapper, CardActionsWrapper, AvatarWrapper }
+export { CardWrapper, CardActionsWrapper, AvatarWrapper }

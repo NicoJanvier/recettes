@@ -13,7 +13,7 @@ import { usePlanningState } from "../contexts/planning";
 
 import EditableTextField from "../EditableTextField";
 import { fromNow } from "../utils/date";
-import { Wrapper, CardActionsWrapper, AvatarWrapper } from './index.style';
+import { CardWrapper, CardActionsWrapper, AvatarWrapper } from './index.style';
 
 function RecipeCard({
     recipe,
@@ -40,7 +40,7 @@ function RecipeCard({
     setShowNoteField(true);
   }
   return (
-    <Wrapper selected={selected}>
+    <CardWrapper selected={selected}>
       <CardContent>
         <Typography variant="h6" component="h2">
           {title}
@@ -81,7 +81,7 @@ function RecipeCard({
         </Button>
         {!!onPick && <Button onClick={() => onPick(recipe)}>AJOUTER</Button>}
       </CardActionsWrapper>
-    </Wrapper>
+    </CardWrapper>
   );
 }
 

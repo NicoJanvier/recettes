@@ -9,6 +9,10 @@ const StyledAppBar = styled(AppBar)`
   ${({ theme }) => theme.breakpoints.up("sm")} {
     width: calc(100% - ${drawerWidth});
   }
+  ${({ showMenu }) => !showMenu && ({
+    marginLeft: "0 !important",
+    width: "100% !important",
+  })}
 `
 const MenuButton = styled(IconButton)`
   color: inherit;
