@@ -15,9 +15,14 @@ import Recipe from "../Recipe";
 
 const StyledBox = styled(Box)`
   position: relative;
-  top: 50px;
   flex-grow: 1;
-  padding: ${({ theme }) => theme.spacing(3)}px;
+  top: ${({ theme }) => theme.spacing(7)}px;
+  @media (min-width: 0px) and (orientation: lanscape) {
+    top: ${({ theme }) => theme.spacing(6)}px;
+  }
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    top: ${({ theme }) => theme.spacing(8)}px;
+  }
 `
 const Routes = () => {
   const { isLogged, isLoading: isUserLoading } = useUserState();

@@ -3,11 +3,15 @@ import React from "react";
 import { Link as RouterLink } from "@reach/router";
 import {
   Typography,
-  CardContent,
   Button,
   IconButton,
+  CardActionArea,
+  CardContent,
+  Menu,
+  MenuItem,
+  Divider,
 } from "@material-ui/core";
-import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { usePlanningState } from "../contexts/planning";
 
@@ -16,11 +20,12 @@ import { fromNow } from "../utils/date";
 import { CardWrapper, CardActionsWrapper, AvatarWrapper } from './index.style';
 
 function RecipeCard({
-    recipe,
-    planningPoint = {},
-    selected = false,
-    onPick,
-  }) {
+  recipe,
+  planningPoint = {},
+  selected = false,
+  onPick,
+  onRemove,
+}) {
   const { title, _id, url, vegetarian: veg, description } = recipe;
   const savedNote = planningPoint.note || "";
   const [note, setNote] = React.useState(savedNote);
@@ -36,50 +41,81 @@ function RecipeCard({
   const isPlanned = !!planningPoint.date;
   const [showNoteField, setShowNoteField] = React.useState(planningPoint.date && savedNote !== "");
   const onNoteClick = () => {
-    if(showNoteField) return
-    setShowNoteField(true);
+    setShowNoteField(!showNoteField);
   }
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleMenuClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <CardWrapper selected={selected}>
-      <CardContent>
-        <Typography variant="h6" component="h2">
-          {title}
-        </Typography>
-        {recipe.lastDate && (
-          <Typography component="span">
-            <i>{fromNow(recipe.lastDate)}</i>
+      <CardActionArea component={RouterLink} to={`/recipes/${_id}`}>
+        <CardContent>
+          <Typography variant="h6" component="h2">
+            {title}
           </Typography>
-        )}
-        {description && (<Typography>{description}</Typography>)}
-        {showNoteField && (
+          {recipe.lastDate && (
+            <Typography component="span">
+              <i>{fromNow(recipe.lastDate)}</i>
+            </Typography>
+          )}
+          {description && (<Typography>{description}</Typography>)}
+        </CardContent>
+      </CardActionArea>
+      <Divider light/>
+      {showNoteField &&
+        <CardContent>
           <EditableTextField
-            multiline
-            fullWidth
-            name="note"
             value={note}
             hasChanged={note !== savedNote}
             onChange={onChange}
             onSave={onSave}
             onClear={() => setNote("")}
+            onClose={onNoteClick}
           />
-        )}
-      </CardContent>
+        </CardContent>
+      }
       <CardActionsWrapper>
         {veg && <AvatarWrapper>V</AvatarWrapper>}
         {url && (
-          <IconButton
+          <Button
             href={url}
             target="_blank"
             rel="noreferrer noopener"
+            size="small"
+            color="primary"
           >
-            <OpenInNewIcon style={{ fontSize: 20 }} />
-          </IconButton>
+            LIEN
+          </Button>
         )}
-        {(isPlanned && !showNoteField) && <Button onClick={onNoteClick}>NOTE</Button>}
-        <Button component={RouterLink} to={`/recipes/${_id}`}>
-          PLUS
-        </Button>
-        {!!onPick && <Button onClick={() => onPick(recipe)}>AJOUTER</Button>}
+        {isPlanned &&
+          <>
+            <IconButton size="small" onClick={handleMenuClick}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="extras-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem
+                onClick={() => { onNoteClick(); handleMenuClose(); }}
+                disabled={showNoteField}
+              >
+                Ajouter une note
+              </MenuItem>
+              <MenuItem onClick={onRemove}>Supprimer</MenuItem>
+            </Menu>
+          </>
+        }
+        {!!onPick && <Button onClick={() => onPick(recipe)} size="small">AJOUTER</Button>}
       </CardActionsWrapper>
     </CardWrapper>
   );

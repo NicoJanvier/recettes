@@ -16,8 +16,6 @@ const AvatarWrapper = styled(Avatar)`
   width: 25px;
   height: 25px;
   font-size: 12px;
-  margin-right: auto;
-  margin-left: ${({ theme }) => theme.spacing(1)}px;
+  margin: 3px auto 3px 3px;
 `
-
 export { CardWrapper, CardActionsWrapper, AvatarWrapper }

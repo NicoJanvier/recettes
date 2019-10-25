@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Grid,
-  Container,
   IconButton,
   Button,
   DialogContent,
@@ -11,8 +10,6 @@ import RootRef from "@material-ui/core/RootRef";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
-// import DateRangeIcon from "@material-ui/icons/DateRange";
-import ClearIcon from "@material-ui/icons/Clear";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
@@ -25,11 +22,12 @@ import { useDaysList } from "./hooks/useDaysList";
 
 import {
   GridRow,
+  BeforeButton,
   DateText,
   AddBtnCard,
   RecipeCardWrapper,
-  RemoveButton,
   DialogWrapper,
+  ContainerWrapper,
 } from "./index.style";
 
 function Planning() {
@@ -81,12 +79,16 @@ function Planning() {
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Container>
+      <ContainerWrapper>
         {isError && "ERROR"}
         <Grid container spacing={4} direction="column" alignItems="center">
-          <Grid item>
-            <Button onClick={() => onPreviousClick()} color="primary" >Jours précédents</Button>
-          </Grid>
+          <BeforeButton
+            onClick={() => onPreviousClick()}
+            color="primary"
+            size="small"
+          >
+            Jours précédents
+          </BeforeButton>
           {days.map(({ date, planningPoints }) => (
             <React.Fragment key={date}>
               {isToday(date) && <div ref={todayRef} />}
@@ -111,6 +113,7 @@ function Planning() {
                       <GridRow
                         item
                         container
+                        spacing={1}
                       >
                         {planningPoints.map((planningPoint, index) => {
                           const id = `${planningPoint._id}_${date}_${index}`;
@@ -132,15 +135,8 @@ function Planning() {
                                       recipe={planningPoint.recipe}
                                       selected={isToday(date)}
                                       planningPoint={planningPoint}
+                                      onRemove={() => onRemove(planningPoint._id, date)}
                                     />
-                                    <RemoveButton
-                                      color="primary"
-                                      size="small"
-                                      onClick={() => onRemove(planningPoint._id, date)}
-                                      name="remove"
-                                    >
-                                      <ClearIcon />
-                                    </RemoveButton>
                                   </RecipeCardWrapper>
                                 </RootRef>
                               )}
@@ -188,7 +184,7 @@ function Planning() {
             </Button>
           </DialogActions>
         </DialogWrapper>
-      </Container>
+      </ContainerWrapper>
     </DragDropContext>
   );
 }

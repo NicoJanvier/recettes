@@ -11,6 +11,14 @@ const AppBarWrapper = styled(AppBar)`
   position: sticky;
   background-color: white;
   z-index: 1;
+  
+  top: ${({ theme }) => theme.spacing(7)}px;
+  @media (min-width: 0px) and (orientation: lanscape) {
+    top: ${({ theme }) => theme.spacing(6)}px;
+  }
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    top: ${({ theme }) => theme.spacing(8)}px;
+  }
 `
 const SearchInput = styled(InputBase)`
   padding: ${({ theme }) => theme.spacing(1)}px ${({ theme }) => theme.spacing(2)}px;;
