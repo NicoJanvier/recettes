@@ -10,13 +10,14 @@ import {
   IconButton,
   FormControlLabel,
   Checkbox,
-  Grid
+  Grid,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import SaveIcon from "@material-ui/icons/Save";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import useRecipe from "./hooks/useRecipe";
 import { useUserState } from "../contexts/user";
+import DeleteDialog from "./dialog";
 
 const Paper = styled(Grid)`
   margin-top: ${({ theme }) => theme.spacing(3)}px;
@@ -56,12 +57,13 @@ const Recipe = ({ id }) => {
       .then((res) => {
         if (id === "new") {
           const id = res.data.data._id;
-          navigate(`/recipes/${id}`);
+          navigate(`/recipes/${id}`, { replace: true });
         }
       })
       .catch(err => console.error(err));
   };
   const onDelete = () => onRemove().then(() => window.history.back());
+  const [open, setOpen] = React.useState(false)
   return (
     <Container key={id}>
       {!(isLoading && isRecipeEmpty) &&
@@ -150,13 +152,16 @@ const Recipe = ({ id }) => {
                 </Button>
             }
             {(id !== "new") && canModify &&
-              <Button
-                onClick={() => onDelete().then(() => window.history.back())}
-                variant="contained"
-                startIcon={<DeleteIcon />}
-              >
-                Supprimer
+              <>
+                <Button
+                  onClick={() => setOpen(true)}
+                  variant="contained"
+                  startIcon={<DeleteIcon />}
+                >
+                  Supprimer
                 </Button>
+                <DeleteDialog {...{ open, setOpen, onDelete }} />
+              </>
             }
           </Buttons>
         </Paper>}
