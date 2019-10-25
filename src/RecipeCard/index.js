@@ -67,56 +67,60 @@ function RecipeCard({
           {description && (<Typography>{description}</Typography>)}
         </CardContent>
       </CardActionArea>
-      <Divider light/>
-      {showNoteField &&
-        <CardContent>
-          <EditableTextField
-            value={note}
-            hasChanged={note !== savedNote}
-            onChange={onChange}
-            onSave={onSave}
-            onClear={() => setNote("")}
-            onClose={onNoteClick}
-          />
-        </CardContent>
-      }
-      <CardActionsWrapper>
-        {veg && <AvatarWrapper>V</AvatarWrapper>}
-        {url && (
-          <Button
-            href={url}
-            target="_blank"
-            rel="noreferrer noopener"
-            size="small"
-            color="primary"
-          >
-            LIEN
-          </Button>
-        )}
-        {isPlanned &&
-          <>
-            <IconButton size="small" onClick={handleMenuClick}>
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="extras-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItem
-                onClick={() => { onNoteClick(); handleMenuClose(); }}
-                disabled={showNoteField}
+      {(veg || url || onPick || isPlanned) &&
+        <>
+          <Divider light />
+          {showNoteField &&
+            <CardContent>
+              <EditableTextField
+                value={note}
+                hasChanged={note !== savedNote}
+                onChange={onChange}
+                onSave={onSave}
+                onClear={() => setNote("")}
+                onClose={onNoteClick}
+              />
+            </CardContent>
+          }
+          <CardActionsWrapper>
+            {veg && <AvatarWrapper>V</AvatarWrapper>}
+            {url && (
+              <Button
+                href={url}
+                target="_blank"
+                rel="noreferrer noopener"
+                size="small"
+                color="primary"
               >
-                Ajouter une note
-              </MenuItem>
-              <MenuItem onClick={onRemove}>Supprimer</MenuItem>
-            </Menu>
-          </>
-        }
-        {!!onPick && <Button onClick={() => onPick(recipe)} size="small">AJOUTER</Button>}
-      </CardActionsWrapper>
+                LIEN
+            </Button>
+            )}
+            {isPlanned &&
+              <>
+                <IconButton size="small" onClick={handleMenuClick}>
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="extras-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem
+                    onClick={() => { onNoteClick(); handleMenuClose(); }}
+                    disabled={showNoteField}
+                  >
+                    Ajouter une note
+                </MenuItem>
+                  <MenuItem onClick={onRemove}>Supprimer</MenuItem>
+                </Menu>
+              </>
+            }
+            {!!onPick && <Button onClick={() => onPick(recipe)} size="small">AJOUTER</Button>}
+          </CardActionsWrapper>
+        </>
+      }
     </CardWrapper>
   );
 }
