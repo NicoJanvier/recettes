@@ -4,12 +4,13 @@ import {
   IconButton,
   Button,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from "@material-ui/core";
 import RootRef from "@material-ui/core/RootRef";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
+import { navigate } from "@reach/router";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
@@ -179,8 +180,11 @@ function Planning() {
             <List onPick={onPick} />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDialogOpen(false)} color="primary">
-              Close
+            <Button
+              onClick={() => navigate("/recipes/new", { state: { pickDate } })}
+              color="primary"
+            >
+              Nouvelle Recette
             </Button>
           </DialogActions>
         </DialogWrapper>

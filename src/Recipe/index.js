@@ -18,6 +18,7 @@ import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 import useRecipe from "./hooks/useRecipe";
 import { useUserState } from "../contexts/user";
 import DeleteDialog from "./dialog";
+import { useDaysList } from "../Planning/hooks/useDaysList";
 
 const Paper = styled(Grid)`
   margin-top: ${({ theme }) => theme.spacing(3)}px;
@@ -43,12 +44,15 @@ const Buttons = styled(Grid)`
     }
   }
 `
-const Recipe = ({ id }) => {
+const Recipe = ({ id, location }) => {
   const { recipe, isLoading, onRemove, onSave } = useRecipe(id);
   const { house } = useUserState();
   const canModify = id === 'new' || recipe.house === house.id;
   const isRecipeEmpty = !recipe.title;
   const { register, errors, handleSubmit, formState } = useForm();
+
+  const { moveRecipe } = useDaysList();
+  const isPickingDate = Boolean(location.state.pickDate);
 
   const onSubmit = data => {
     onSave({
@@ -56,8 +60,14 @@ const Recipe = ({ id }) => {
     })
       .then((res) => {
         if (id === "new") {
-          const id = res.data.data._id;
-          navigate(`/recipes/${id}`, { replace: true });
+          const recipe = res.data.data;
+          if (isPickingDate) {
+            moveRecipe({ recipe, add: { date: location.state.pickDate } });
+            navigate('/planning');
+          } else {
+            const id = recipe._id;
+            navigate(`/recipes/${id}`, { replace: true });
+          }
         }
       })
       .catch(err => console.error(err));
@@ -148,7 +158,7 @@ const Recipe = ({ id }) => {
                 color="primary"
                 startIcon={<SaveIcon />}
               >
-                Sauvegarder
+                {isPickingDate ? "Ajouter au planning" : "Sauvegarder"}
                 </Button>
             }
             {(id !== "new") && canModify &&

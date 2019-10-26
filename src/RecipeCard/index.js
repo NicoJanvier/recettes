@@ -117,7 +117,15 @@ function RecipeCard({
                 </Menu>
               </>
             }
-            {!!onPick && <Button onClick={() => onPick(recipe)} size="small">AJOUTER</Button>}
+            {!!onPick &&
+              <Button
+                onClick={() => onPick(recipe)}
+                size="small"
+                variant="outlined"
+                color="primary"
+              >
+                AJOUTER
+              </Button>}
           </CardActionsWrapper>
         </>
       }
