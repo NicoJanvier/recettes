@@ -8,17 +8,21 @@ import Routes from "./Routes";
 import ThemeProvider from "./contexts/theme";
 
 const Flex = styled.div`
-  display: flex;
+  > div {
+    display: flex;
+  }
 `
 export default function App() {
   return (
-    <ThemeProvider>
-      <UserProvider>
-        <Flex>
-          <CssBaseline />
-          <Routes />
-        </Flex>
-      </UserProvider>
-    </ThemeProvider>
+    <>
+      <CssBaseline />
+      <ThemeProvider>
+        <UserProvider>
+          <Flex>
+            <Routes />
+          </Flex>
+        </UserProvider>
+      </ThemeProvider>
+    </>
   );
 }

@@ -18,36 +18,32 @@ function HeaderBar({ isLoading, hideMenu }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { username } = useUserState();
   return (
-    <Location>
-      {({ location }) => (
-        <React.Fragment>
-          <StyledAppBar showMenu={!hideMenu}>
-            <Toolbar>
-              {!hideMenu &&
-                <MenuButton
-                  aria-label="Open drawer"
-                  edge="start"
-                  onClick={() => setMobileOpen(!mobileOpen)}
-                >
-                  <MenuIcon />
-                </MenuButton>
-              }
-              <Title variant="h6" component="h1" noWrap>
-                Mes Recettes
-              </Title>
-              {username && <Typography variant="button">{username}</Typography>}
-            </Toolbar>
-            {isLoading && <LinearProgress color="secondary" />}
-          </StyledAppBar>
+    <React.Fragment>
+      <StyledAppBar showMenu={!hideMenu}>
+        <Toolbar>
           {!hideMenu &&
-            <Menu
-              mobileOpen={mobileOpen}
-              setMobileOpen={setMobileOpen}
-            />
+            <MenuButton
+              aria-label="Open drawer"
+              edge="start"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              <MenuIcon />
+            </MenuButton>
           }
-        </React.Fragment>
-      )}
-    </Location>
+          <Title variant="h6" component="h1" noWrap>
+            Mes Recettes
+              </Title>
+          {username && <Typography variant="button">{username}</Typography>}
+        </Toolbar>
+        {isLoading && <LinearProgress color="secondary" />}
+      </StyledAppBar>
+      {!hideMenu &&
+        <Menu
+          mobileOpen={mobileOpen}
+          setMobileOpen={setMobileOpen}
+        />
+      }
+    </React.Fragment>
   );
 }
 

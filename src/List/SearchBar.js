@@ -31,8 +31,8 @@ const SearchBar = ({
       <Container>
         <SearchInput
           placeholder="Rechercher..."
-          autoFocus
-          fullWidth={true}
+          // autoFocus
+          fullWidth
           value={search}
           onChange={({ target: { value } }) => dispatch({ type: 'SEARCH', payload: value })}
           endAdornment={

@@ -4,7 +4,10 @@ import { rem } from 'polished';
 const theme = {
   palette: {
     primary: {
-      main: '#388e3c',
+      contrastText: "#fff",
+      dark: "rgb(39, 99, 42)",
+      light: "rgb(95, 164, 99)",
+      main: "#388e3c",
     },
     secondary: amber,
   },

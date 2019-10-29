@@ -31,7 +31,7 @@ import {
   ContainerWrapper,
 } from "./index.style";
 
-function Planning() {
+const Planning = ({ navigate }) => {
   const { days, addDays, isError, moveRecipe } = useDaysList();
 
   // Scrolling
@@ -65,16 +65,17 @@ function Planning() {
 
   const onRemove = (id, date) => moveRecipe({ id, remove: { date } })
 
-  const [isDialogOpen, setDialogOpen] = React.useState(false);
-  const [pickDate, setPickDate] = React.useState(null);
+  // const [isDialogOpen, setDialogOpen] = React.useState(false);
+  // const [pickDate, setPickDate] = React.useState(null);
   const onClickPick = date => {
-    setPickDate(date);
-    setDialogOpen(true);
+    // setPickDate(date);
+    // setDialogOpen(true);
+    navigate(`recipes?date=${date}`, { state: { isPicking: true }})
   };
-  const onPick = recipe => {
-    moveRecipe({ recipe, add: { date: pickDate } });
-    setDialogOpen(false);
-  };
+  // const onPick = recipe => {
+  //   moveRecipe({ recipe, add: { date: pickDate } });
+  //   setDialogOpen(false);
+  // };
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -161,7 +162,7 @@ function Planning() {
             </React.Fragment>
           ))}
         </Grid>
-        <DialogWrapper
+        {/* <DialogWrapper
           open={isDialogOpen}
           onClose={() => setDialogOpen(false)}
           classes={{ paper: "paper" }}
@@ -187,7 +188,7 @@ function Planning() {
               Nouvelle Recette
             </Button>
           </DialogActions>
-        </DialogWrapper>
+        </DialogWrapper> */}
       </ContainerWrapper>
     </DragDropContext>
   );

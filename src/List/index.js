@@ -1,5 +1,6 @@
 import React from "react";
-import Fuse from 'fuse.js'
+import Fuse from 'fuse.js';
+import * as queryString from 'query-string';
 import {
   Grid,
   Container,
@@ -9,6 +10,7 @@ import SearchBar from "./SearchBar";
 import RecipeCard from "../RecipeCard";
 import { useEnhancedRecipes } from "./hooks/useEnhancedRecipes";
 import { GridContainer } from './index.style'
+import { useDaysList } from "../Planning/hooks/useDaysList";
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -25,7 +27,7 @@ function reducer(state, { type, payload }) {
   }
 };
 
-export default function List({ onPick }) {
+const List = ({ onPick }) => {
   const { recipes, isError } = useEnhancedRecipes();
   const [state, dispatch] = React.useReducer(reducer, {
     search: '',
@@ -58,6 +60,7 @@ export default function List({ onPick }) {
       return null;
     });
 
+
   return (
     <>
       <SearchBar dispatch={dispatch} {...state} />
@@ -66,7 +69,7 @@ export default function List({ onPick }) {
         <GridContainer container spacing={2}>
           {listRecipes.map(recipe => (
             <Grid item xs={12} key={recipe._id}>
-              <RecipeCard recipe={recipe} onPick={onPick} />
+              <RecipeCard {...{ recipe, onPick }} />
             </Grid>
           ))}
         </GridContainer>
@@ -74,3 +77,5 @@ export default function List({ onPick }) {
     </>
   );
 }
+
+export default List

@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components';
-import { AppBar, IconButton, Typography } from '@material-ui/core';
+import { AppBar, IconButton, Typography, Box } from '@material-ui/core';
 
 const drawerWidth = "240px";
 
@@ -40,6 +40,18 @@ const StyledNav = styled.nav`
     width: ${drawerWidth};
   }
 `
+const BoxNextAppBar = styled(Box)`
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  top: ${({ theme }) => theme.spacing(7)}px;
+  @media (min-width: 0px) and (orientation: lanscape) {
+    top: ${({ theme }) => theme.spacing(6)}px;
+  }
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    top: ${({ theme }) => theme.spacing(8)}px;
+  }
+`
 
 export {
   StyledAppBar,
@@ -47,4 +59,5 @@ export {
   Title,
   ToolbarPlaceholder,
   StyledNav,
+  BoxNextAppBar,
 }
