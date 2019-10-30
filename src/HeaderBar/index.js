@@ -1,5 +1,4 @@
 import React from "react";
-import { Location } from "@reach/router";
 import {
   Typography,
   LinearProgress,

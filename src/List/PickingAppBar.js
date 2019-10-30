@@ -1,20 +1,22 @@
 import React from 'react'
 import styled from 'styled-components';
 import { lighten } from 'polished'
-import { AppBar, Toolbar, IconButton, InputBase, Typography } from '@material-ui/core'
+import { AppBar, Toolbar, IconButton, InputBase, Typography, Badge } from '@material-ui/core'
 import CloseIcon from "@material-ui/icons/Close";
-import AddIcon from "@material-ui/icons/Add";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import ClearIcon from "@material-ui/icons/Clear";
 import SearchIcon from "@material-ui/icons/Search";
+import FilterListIcon from "@material-ui/icons/FilterList";
 
 const StyledSearchIcon = styled(SearchIcon)``
-const SearchField = styled(InputBase)`
+const SearchField = styled(({ active, ...props}) => <InputBase {...props}/>)`
   color: inherit;
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   background-color: ${({ theme }) => theme.palette.primary.light};
   width: 100%;
   max-width: 25em;
   margin-left: auto;
+  margin-right: ${({ theme }) => theme.spacing(1)}px;
   padding-right: ${({ theme }) => theme.spacing(1)}px;
   padding-left: ${({ theme }) => theme.spacing(1)}px;
   transition: all .2s ease-in-out;
@@ -36,13 +38,14 @@ const Title = styled(Typography)`
     flex: 1;
   }
 `
-const PickingAppBar = ({ onBack, onNew, search, dispatch }) => {
+const PickingAppBar = ({ onBack, onNew, search, dispatch, veg }) => {
   const onKeyPress = event => {
     if (event.key === 'Enter') {
       event.target.blur();
       event.preventDefault();
     }
   }
+  const isFiltered = veg // AND/OR others...
   return (
     <>
       <AppBar>
@@ -69,8 +72,17 @@ const PickingAppBar = ({ onBack, onNew, search, dispatch }) => {
               </>
             }
           />
-          <IconButton onClick={onNew} color="inherit">
-            <AddIcon />
+          <IconButton
+            onClick={() => dispatch({ type: "TOGGLE_PANEL" })}
+            color="inherit"
+            size="small"
+          >
+            <Badge invisible={!isFiltered} variant="dot" color="secondary">
+              <FilterListIcon />
+            </Badge>
+          </IconButton>
+          <IconButton onClick={onNew} color="inherit" >
+            <PlaylistAddIcon />
           </IconButton>
         </Toolbar>
       </AppBar>

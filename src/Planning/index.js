@@ -2,21 +2,14 @@ import React from "react";
 import {
   Grid,
   IconButton,
-  Button,
-  DialogContent,
-  DialogActions,
 } from "@material-ui/core";
 import RootRef from "@material-ui/core/RootRef";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
-import { navigate } from "@reach/router";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
 
 import { formatToDay, formatToDayOfWeek, isToday } from "../utils/date";
 import RecipeCard from "../RecipeCard";
-import List from "../List";
 import { scrollToRef } from "../utils/toolkit";
 import { useDaysList } from "./hooks/useDaysList";
 
@@ -27,7 +20,6 @@ import {
   DateText,
   AddBtnCard,
   RecipeCardWrapper,
-  DialogWrapper,
   ContainerWrapper,
 } from "./index.style";
 
@@ -65,20 +57,10 @@ const Planning = ({ navigate }) => {
 
   const onRemove = (id, date) => moveRecipe({ id, remove: { date } })
 
-  // const [isDialogOpen, setDialogOpen] = React.useState(false);
-  // const [pickDate, setPickDate] = React.useState(null);
   const onClickPick = date => {
-    // setPickDate(date);
-    // setDialogOpen(true);
     navigate(`recipes?date=${date}`, { state: { isPicking: true }})
   };
-  // const onPick = recipe => {
-  //   moveRecipe({ recipe, add: { date: pickDate } });
-  //   setDialogOpen(false);
-  // };
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <ContainerWrapper>
@@ -162,33 +144,6 @@ const Planning = ({ navigate }) => {
             </React.Fragment>
           ))}
         </Grid>
-        {/* <DialogWrapper
-          open={isDialogOpen}
-          onClose={() => setDialogOpen(false)}
-          classes={{ paper: "paper" }}
-          fullScreen={fullScreen}
-          maxWidth="sm"
-          fullWidth
-          scroll="paper"
-        >
-          <DialogContent
-            dividers
-            classes={{
-              root: "content",
-              dividers: "dividers"
-            }}
-          >
-            <List onPick={onPick} />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => navigate("/recipes/new", { state: { pickDate } })}
-              color="primary"
-            >
-              Nouvelle Recette
-            </Button>
-          </DialogActions>
-        </DialogWrapper> */}
       </ContainerWrapper>
     </DragDropContext>
   );

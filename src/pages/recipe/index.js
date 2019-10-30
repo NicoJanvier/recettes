@@ -12,27 +12,28 @@ import CloseIcon from "@material-ui/icons/Close";
 const RecipePage = ({ id, location, navigate }) => {
   const { isLoading } = useRecipesState()
   const { date } = queryString.parse(location.search)
+  const onBack = () => navigate(`../${location.search}`, { state: location.state })
   return (
     <>
       {!date ?
         <HeaderBar isLoading={isLoading} /> :
-        <PickingAppBar {...{ navigate, location }} />
+        <PickingAppBar {...{ onBack }} />
       }
       <BoxNextAppBar>
-        <Container>
+        <Container maxWidth="sm">
           <Recipe {...{ id, date, navigate }} />
         </Container>
       </BoxNextAppBar>
     </>
   )
 }
-const PickingAppBar = ({ navigate, location }) =>
+const PickingAppBar = ({ onBack }) =>
   <AppBar>
-    <Toolbar>
-      <IconButton mr={2} onClick={() => navigate(`../${location.search}`)} color="inherit">
+    <Toolbar disableGutters>
+      <IconButton onClick={onBack} color="inherit">
         <CloseIcon />
       </IconButton>
-      <Title variant="h6" component="h1">Choisir une recette</Title>
+      <Title variant="h6" component="h1">Nouvelle recette</Title>
     </Toolbar>
   </AppBar>
 export default RecipePage

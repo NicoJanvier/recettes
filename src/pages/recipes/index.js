@@ -3,7 +3,7 @@ import * as queryString from 'query-string'
 import HeaderBar from '../../HeaderBar'
 import { BoxNextAppBar } from '../../HeaderBar/index.style'
 
-import { Container, Grid } from '@material-ui/core'
+import { Container, Grid, Typography } from '@material-ui/core'
 import { useDaysList } from '../../Planning/hooks/useDaysList'
 
 import { useEnhancedRecipes } from './hooks/useEnhancedRecipes'
@@ -12,6 +12,7 @@ import SearchBar from '../../List/SearchBar'
 import RecipeCard from '../../RecipeCard'
 import { GridContainer } from '../../List/index.style'
 import PickingAppBar from '../../List/PickingAppBar'
+import FiltersExpansion from '../../List/FiltersExpansion'
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -23,6 +24,8 @@ function reducer(state, { type, payload }) {
       return { ...state, veg: !state.veg };
     case 'TOGGLE_SORT_BY_DATE':
       return { ...state, sortByDate: !state.sortByDate };
+    case 'TOGGLE_PANEL':
+      return { ...state, expanded: !state.expanded };
     default:
       throw new Error(`Unhandled type: ${type}`);
   }
@@ -42,7 +45,8 @@ const RecipesPage = ({ navigate, location }) => {
   const [state, dispatch] = React.useReducer(reducer, {
     search: '',
     veg: false,
-    sortByDate: true,
+    sortByDate: false,
+    expanded: false,
   });
   const { search, veg, sortByDate } = state;
 
@@ -81,7 +85,10 @@ const RecipesPage = ({ navigate, location }) => {
         />
       }
       <BoxNextAppBar>
-        {!isPicking && <SearchBar dispatch={dispatch} {...state} />}
+        {!isPicking ?
+          <SearchBar dispatch={dispatch} {...state} /> :
+          <FiltersExpansion {...{dispatch, ...state}}/>
+        }
         <Container>
           {isError && "Une erreur est apparue."}
           <GridContainer container spacing={2}>
@@ -90,6 +97,11 @@ const RecipesPage = ({ navigate, location }) => {
                 <RecipeCard {...{ recipe, onPick: isPicking ? onPick : null }} />
               </Grid>
             ))}
+            {(!listRecipes.length && search) &&
+              <Grid item xs={12}>
+                <Typography color="textSecondary">{`Aucune recette pour "${search}"`}</Typography>
+              </Grid>
+            }
           </GridContainer>
         </Container>
       </BoxNextAppBar>
