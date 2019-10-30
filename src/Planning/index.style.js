@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import { Grid, Typography, Fab, Dialog, Container, Button } from '@material-ui/core';
-import { AppBarWrapper } from '../List/index.style'
+import { Grid, Typography, Container, Button } from '@material-ui/core';
 
 const ContainerWrapper = styled(Container)`
   padding-left: ${({ theme }) => theme.spacing(3)}px;
@@ -36,21 +35,6 @@ const RecipeCardWrapper = styled(Grid)`
     }
   }
 `
-const DialogWrapper = styled(Dialog)`
-  .paper {
-    height: 100%;
-  }
-  .content {
-    padding: 0;
-    background-color: ${({ theme }) => theme.palette.grey[50]};
-  }
-  .dividers {
-    border-top: none;
-  }
-  ${AppBarWrapper} {
-    top: 0;
-  }
-`
 
 export {
   GridRow,
@@ -58,6 +42,5 @@ export {
   DateText,
   AddBtnCard,
   RecipeCardWrapper,
-  DialogWrapper,
   ContainerWrapper,
 }
