@@ -71,9 +71,10 @@ function PlanningProvider({ children }) {
         refresh();
         return e;
       });
-  }
+  };
 
   const planning = data.data || [];
+  const offsetState = React.useState(0)
   return (
     <PlanningStateContext.Provider
       value={{
@@ -82,7 +83,8 @@ function PlanningProvider({ children }) {
         isError,
         createPlanningPoint,
         updatePlanningPoint,
-        deletePlanningPoint
+        deletePlanningPoint,
+        offsetState,
       }}
     >
       {children}

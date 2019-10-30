@@ -10,21 +10,27 @@ function getDays(planning, offset) {
   return days
 }
 
-function reducer(state, { type, payload }) {
-  let days;
-  let offset;
-  switch (type) {
-    case 'fromRecipes':
-      if (payload.isLoading || payload.isError) return state;
-      days = getDays(payload.planning, state.offset);
-      return { ...state, days }
-    case 'addDays':
-      offset = state.offset - 10;
-      days = getDays(payload.planning, offset);
-      return { ...state, days, offset }
-    case 'updateDays':
-      const { planningPoint, add, remove } = payload;
-      days = state.days;
+function useDaysList() {
+  const {
+    planning,
+    isError,
+    updatePlanningPoint,
+    createPlanningPoint,
+    deletePlanningPoint,
+    offsetState: [offset, setOffset],
+  } = usePlanningState();
+
+  const initialDays = getDays(planning, offset);
+  const [days, setDays] = React.useState(initialDays);
+
+  React.useEffect(() => {
+    setDays(getDays(planning, offset))
+  }, [planning, offset])
+
+  const addDays = () => setOffset(off => off - 10);
+
+  const updateDays = ({ planningPoint, add, remove }) =>
+    setDays(days => {
       if (!!add) {
         const addDay = days.find(({ date }) => date === add.date);
         const { index = 0 } = add;
@@ -35,44 +41,23 @@ function reducer(state, { type, payload }) {
         const removeDay = days.find(({ date }) => date === remove.date);
         removeDay.planningPoints = removeDay.planningPoints.filter(({ _id }) => _id !== planningPoint._id);
       }
-      return { ...state, days }
-    default:
-      break;
-  }
-}
-
-function useDaysList() {
-  const {
-    planning,
-    isLoading,
-    isError,
-    updatePlanningPoint,
-    createPlanningPoint,
-    deletePlanningPoint,
-  } = usePlanningState();
-
-  const [{ days }, dispatch] = React.useReducer(reducer, { days: [], offset: 0 });
-
-  const addDays = () => dispatch({ type: 'addDays', payload: { planning } });
-
-  React.useEffect(() => {
-    dispatch({ type: 'fromRecipes', payload: { planning } })
-  }, [planning, isLoading, isError]);
+      return days
+    })
 
   const moveRecipe = ({ id, add, remove, recipe }) => {
     let planningPoint;
     if (add && remove) {
       planningPoint = planning.find(({ _id }) => _id === id);
-      dispatch({ type: 'updateDays', payload: { planningPoint, add, remove } });
+      updateDays({ planningPoint, add, remove })
       updatePlanningPoint(planningPoint);
     } else if (add) {
       const { date } = add;
       planningPoint = { date, note: '', _id: 'placeholder', recipe };
-      dispatch({ type: 'updateDays', payload: { planningPoint, add } });
+      updateDays({ planningPoint, add })
       createPlanningPoint({ date, note: '', recipe: recipe._id });
     } else if (remove) {
       planningPoint = planning.find(({ _id }) => _id === id);
-      dispatch({ type: 'updateDays', payload: { planningPoint, remove } });
+      updateDays({ planningPoint, remove })
       deletePlanningPoint(id);
     }
   }
