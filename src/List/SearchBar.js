@@ -22,6 +22,12 @@ const SearchBar = ({
   sortByDate,
   dispatch,
 }) => {
+  const onKeyPress = event => {
+    if (event.key === 'Enter') {
+      event.target.blur();
+      event.preventDefault();
+    }
+  }
   return (
     <AppBarWrapper
       elevation={1}
@@ -53,6 +59,7 @@ const SearchBar = ({
               </IconButton>
             </>
           }
+          onKeyPress={onKeyPress}
         />
       </Container>
     </AppBarWrapper>
