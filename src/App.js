@@ -14,7 +14,7 @@ const Flex = styled.div`
 `
 export default function App() {
   return (
-    <>
+    <React.StrictMode>
       <CssBaseline />
       <ThemeProvider>
         <UserProvider>
@@ -23,6 +23,6 @@ export default function App() {
           </Flex>
         </UserProvider>
       </ThemeProvider>
-    </>
+    </React.StrictMode>
   );
 }

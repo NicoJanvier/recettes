@@ -3,7 +3,6 @@ import {
   Grid,
   IconButton,
 } from "@material-ui/core";
-import RootRef from "@material-ui/core/RootRef";
 import AddIcon from "@material-ui/icons/Add";
 
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"; // https://codesandbox.io/s/4qp6vjp319?from-embed
@@ -93,11 +92,11 @@ const Planning = ({ navigate }) => {
                 </Grid>
                 <Droppable droppableId={date}>
                   {provided => (
-                    <RootRef rootRef={provided.innerRef}>
                       <GridRow
                         item
                         container
                         spacing={1}
+                        ref={provided.innerRef}
                       >
                         {planningPoints.map((planningPoint, index) => {
                           const id = `${planningPoint._id}_${date}_${index}`;
@@ -108,12 +107,12 @@ const Planning = ({ navigate }) => {
                               draggableId={id}
                             >
                               {provided => (
-                                <RootRef rootRef={provided.innerRef}>
                                   <RecipeCardWrapper
                                     item
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
                                     style={provided.draggableProps.style}
+                                    ref={provided.innerRef}
                                   >
                                     <RecipeCard
                                       recipe={planningPoint.recipe}
@@ -122,7 +121,6 @@ const Planning = ({ navigate }) => {
                                       onRemove={() => onRemove(planningPoint._id, date)}
                                     />
                                   </RecipeCardWrapper>
-                                </RootRef>
                               )}
                             </Draggable>
                           );
@@ -137,7 +135,6 @@ const Planning = ({ navigate }) => {
                         </AddBtnCard>
                         {provided.placeholder}
                       </GridRow>
-                    </RootRef>
                   )}
                 </Droppable>
               </Grid>

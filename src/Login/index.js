@@ -20,7 +20,7 @@ const StyledButton = styled(Button)`
 `
 
 const Login = ({ authenticate }) => {
-  const { register, errors, handleSubmit, formState } = useForm();
+  const { register, errors, handleSubmit } = useForm();
   const onSubmit = ({ username: email, password }) => {
     authenticate({ email, password });
   }
@@ -62,7 +62,6 @@ const Login = ({ authenticate }) => {
         <StyledButton
           fullWidth
           type="submit"
-          disabled={!formState.isValid}
           variant="contained"
           color="primary"
         >
