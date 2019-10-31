@@ -1,18 +1,20 @@
 import React from 'react'
 import styled from 'styled-components';
-import { lighten } from 'polished'
 import { AppBar, Toolbar, IconButton, InputBase, Typography, Badge } from '@material-ui/core'
 import CloseIcon from "@material-ui/icons/Close";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import ClearIcon from "@material-ui/icons/Clear";
 import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import { lighten } from '@material-ui/core/styles';
 
-const StyledSearchIcon = styled(SearchIcon)``
+const StyledAppBar = styled(AppBar)`
+  background-color: ${({ theme }) => theme.palette.secondary.dark};
+`
 const SearchField = styled(({ active, ...props}) => <InputBase {...props}/>)`
   color: inherit;
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
-  background-color: ${({ theme }) => theme.palette.primary.light};
+  background-color: ${({ theme }) => theme.palette.secondary.main};
   width: 100%;
   max-width: 25em;
   margin-left: auto;
@@ -21,7 +23,7 @@ const SearchField = styled(({ active, ...props}) => <InputBase {...props}/>)`
   padding-left: ${({ theme }) => theme.spacing(1)}px;
   transition: all .2s ease-in-out;
   &:hover, &:active, &:focus {
-    background-color: ${({ theme }) => lighten(0.05, theme.palette.primary.light)};
+    background-color: ${({ theme }) => lighten(theme.palette.secondary.main, 0.2)};
   }
   ${({ theme }) => theme.breakpoints.up("sm")} {
     width: ${({ active }) => active ? '100%' : '15em'};
@@ -48,7 +50,7 @@ const PickingAppBar = ({ onBack, onNew, search, dispatch, veg }) => {
   const isFiltered = veg // AND/OR others...
   return (
     <>
-      <AppBar>
+      <StyledAppBar>
         <Toolbar disableGutters>
           <IconButton mr={2} onClick={onBack} color="inherit">
             <CloseIcon />
@@ -67,7 +69,7 @@ const PickingAppBar = ({ onBack, onNew, search, dispatch, veg }) => {
                     <ClearIcon />
                   </IconButton>
                 ) : (
-                    <StyledSearchIcon />
+                    <SearchIcon />
                   )}
               </>
             }
@@ -85,7 +87,7 @@ const PickingAppBar = ({ onBack, onNew, search, dispatch, veg }) => {
             <PlaylistAddIcon />
           </IconButton>
         </Toolbar>
-      </AppBar>
+      </StyledAppBar>
     </>
   )
 }

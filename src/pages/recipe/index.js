@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 import * as queryString from 'query-string'
 import { Container } from '@material-ui/core'
 import Recipe from '../../Recipe'
@@ -28,13 +29,16 @@ const RecipePage = ({ id, location, navigate }) => {
     </>
   )
 }
+const StyledAppBar = styled(AppBar)`
+  background-color: ${({ theme }) => theme.palette.secondary.dark};
+`
 const PickingAppBar = ({ onBack }) =>
-  <AppBar>
+  <StyledAppBar>
     <Toolbar disableGutters>
       <IconButton onClick={onBack} color="inherit">
         <CloseIcon />
       </IconButton>
       <Title variant="h6" component="h1">Choisir une recette</Title>
     </Toolbar>
-  </AppBar>
+  </StyledAppBar>
 export default RecipePage
