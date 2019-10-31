@@ -1,19 +1,17 @@
-import moment from "moment";
-
+import moment from 'moment';
+import 'moment/locale/fr';
+moment.locale('fr');
 const fromNow = date => {
-  moment.locale("fr");
   return moment(date).fromNow();
 }
 
 const dateFormat = (date, format) => moment(date).format(format);
 
 const formatToDay = date => {
-  moment.locale("fr");
   return dateFormat(date, "DD MMM");
 };
 
 const formatToDayOfWeek = date => {
-  moment.locale("fr");
   const toDay =  dateFormat(date, "dddd");
   return toDay.charAt(0).toUpperCase() + toDay.slice(1);
 };
