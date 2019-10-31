@@ -40,10 +40,14 @@ const RecipesPage = ({ navigate, location }) => {
     moveRecipe({ recipe, add: { date } });
     navigate("../");
   }
-
+  const pick = {
+    isPicking,
+    onPick,
+    toPath: id => navigate(`${id}${location.search}`, { state: { ...location.state } })
+  }
   const { recipes, isError, isLoading } = useEnhancedRecipes();
   const [state, dispatch] = React.useReducer(reducer, {
-    search: '',
+    search: "",
     veg: false,
     sortByDate: false,
     expanded: false,
@@ -80,21 +84,21 @@ const RecipesPage = ({ navigate, location }) => {
         <HeaderBar isLoading={isLoading} /> :
         <PickingAppBar
           onBack={() => navigate('../')}
-          onNew={() => navigate(`new${location.search}`, { state: { ...location.state } })}
+          onNew={() => navigate(`new${location.search}`, { state: location.state })}
           {...{ dispatch, ...state }}
         />
       }
       <BoxNextAppBar>
         {!isPicking ?
           <SearchBar dispatch={dispatch} {...state} /> :
-          <FiltersExpansion {...{dispatch, ...state}}/>
+          <FiltersExpansion {...{ dispatch, ...state }} />
         }
         <Container>
           {isError && "Une erreur est apparue."}
           <GridContainer container spacing={2}>
             {listRecipes.map(recipe => (
               <Grid item xs={12} key={recipe._id}>
-                <RecipeCard {...{ recipe, onPick: isPicking ? onPick : null }} />
+                <RecipeCard {...{ recipe, pick }} />
               </Grid>
             ))}
             {(!listRecipes.length && search) &&

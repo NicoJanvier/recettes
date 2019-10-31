@@ -1,6 +1,6 @@
 import React from "react";
 // import PropTypes from "prop-types";
-import { Link as RouterLink } from "@reach/router";
+import { navigate } from "@reach/router";
 import {
   Typography,
   Button,
@@ -23,7 +23,7 @@ function RecipeCard({
   recipe,
   planningPoint = {},
   selected = false,
-  onPick,
+  pick = {},
   onRemove,
 }) {
   const { title, _id, url, vegetarian: veg, description } = recipe;
@@ -51,10 +51,17 @@ function RecipeCard({
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
+  const { isPicking, onPick, toPath } = pick;
+  const handleGoToRecipe = () => {
+    if (isPicking) {
+      toPath(_id)
+    } else {
+      navigate(`/recipes/${_id}`)
+    }
+  }
   return (
     <CardWrapper selected={selected}>
-      <CardActionArea component={RouterLink} to={`/recipes/${_id}`}>
+      <CardActionArea onClick={handleGoToRecipe}>
         <CardContent>
           <Typography variant="h6" component="h2">
             {title}
@@ -67,7 +74,7 @@ function RecipeCard({
           {description && (<Typography>{description}</Typography>)}
         </CardContent>
       </CardActionArea>
-      {(veg || url || onPick || isPlanned) &&
+      {(veg || url || isPicking || isPlanned) &&
         <>
           <Divider light />
           {showNoteField &&
@@ -117,7 +124,7 @@ function RecipeCard({
                 </Menu>
               </>
             }
-            {!!onPick &&
+            {isPicking &&
               <Button
                 onClick={() => onPick(recipe)}
                 size="small"
