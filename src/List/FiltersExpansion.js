@@ -13,7 +13,7 @@ const StyledPaper = styled(Paper)`
 const StyledFormGroup = styled(FormGroup)`
   padding: ${({ theme }) => theme.spacing(1)}px ${({ theme }) => theme.spacing(2)}px;
 `
-const FiltersExpansion = ({ dispatch, veg, sortByDate, expanded }) => {
+const FiltersExpansion = ({ dispatch, veg, sortByDate, expanded, search, hideNew }) => {
   return (
     <Wrapper
       elevation={1}
@@ -28,6 +28,27 @@ const FiltersExpansion = ({ dispatch, veg, sortByDate, expanded }) => {
                 <Switch
                   checked={veg}
                   onChange={() => dispatch({ type: 'TOGGLE_VEG' })}
+                  color="primary"
+                />
+              }
+            />
+            <FormControlLabel
+              label="Ranger par date"
+              control={
+                <Switch
+                  checked={sortByDate}
+                  onChange={() => dispatch({ type: 'TOGGLE_SORT_BY_DATE' })}
+                  color="primary"
+                  disabled={Boolean(search)}
+                />
+              }
+            />
+            <FormControlLabel
+              label="Cacher nouvelles"
+              control={
+                <Switch
+                  checked={hideNew}
+                  onChange={() => dispatch({ type: 'TOGGLE_HIDE_NEW' })}
                   color="primary"
                 />
               }

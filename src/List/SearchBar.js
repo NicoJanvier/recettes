@@ -54,8 +54,8 @@ const SearchBar = ({
               <IconButton onClick={() => dispatch({ type: 'TOGGLE_VEG' })}>
                 <VegAvatar on={veg ? veg : null}>V</VegAvatar>
               </IconButton>
-              <IconButton onClick={() => dispatch({ type: 'TOGGLE_SORT_BY_DATE' })}>
-                <StyledSortIcon />
+              <IconButton onClick={() => dispatch({ type: 'TOGGLE_SORT_BY_DATE' })} disabled={Boolean(search)}>
+                <StyledSortIcon on={sortByDate}/>
               </IconButton>
             </>
           }

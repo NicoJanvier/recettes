@@ -43,7 +43,7 @@ const VegAvatar = styled(Avatar)`
 `
 
 const StyledSortIcon = styled(SortIcon)`
-  color: ${({ on }) => !on && "black"};
+  color: ${({ on }) => on && "black"};
 `
 export {
   GridContainer,

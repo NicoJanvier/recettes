@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components';
-import { AppBar, Toolbar, IconButton, InputBase, Typography, Badge } from '@material-ui/core'
+import { AppBar, Toolbar, IconButton, InputBase, Typography, Badge, Button } from '@material-ui/core'
 import CloseIcon from "@material-ui/icons/Close";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -11,7 +11,7 @@ import { lighten } from '@material-ui/core/styles';
 const StyledAppBar = styled(AppBar)`
   background-color: ${({ theme }) => theme.palette.secondary.dark};
 `
-const SearchField = styled(({ active, ...props}) => <InputBase {...props}/>)`
+const SearchField = styled(({ active, ...props }) => <InputBase {...props} />)`
   color: inherit;
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   background-color: ${({ theme }) => theme.palette.secondary.main};
@@ -30,7 +30,19 @@ const SearchField = styled(({ active, ...props}) => <InputBase {...props}/>)`
     &:hover, &:active, &:focus {
       width: 100%;
     }
-    
+  }
+`
+
+const StyledIconButton = styled(IconButton)`
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    display: none;
+  }
+`
+const StyledButton = styled(Button)`
+  display: none;
+  margin-right: ${({ theme }) => theme.spacing(1)}px;
+  ${({ theme }) => theme.breakpoints.up("sm")} {
+    display: flex;
   }
 `
 const Title = styled(Typography)`
@@ -40,14 +52,14 @@ const Title = styled(Typography)`
     flex: 1;
   }
 `
-const PickingAppBar = ({ onBack, onNew, search, dispatch, veg }) => {
+const PickingAppBar = ({ onBack, onNew, search, dispatch, veg, sortByDate, hideNew }) => {
   const onKeyPress = event => {
     if (event.key === 'Enter') {
       event.target.blur();
       event.preventDefault();
     }
   }
-  const isFiltered = veg // AND/OR others...
+  const isFiltered = veg || sortByDate || hideNew // AND/OR others...
   return (
     <>
       <StyledAppBar>
@@ -74,18 +86,40 @@ const PickingAppBar = ({ onBack, onNew, search, dispatch, veg }) => {
               </>
             }
           />
-          <IconButton
+          {/* Icons for mobile */}
+          <StyledIconButton
             onClick={() => dispatch({ type: "TOGGLE_PANEL" })}
             color="inherit"
             size="small"
           >
-            <Badge invisible={!isFiltered} variant="dot" color="secondary">
+            <Badge invisible={!isFiltered} variant="dot" color="primary">
               <FilterListIcon />
             </Badge>
-          </IconButton>
-          <IconButton onClick={onNew} color="inherit" >
+          </StyledIconButton>
+          <StyledIconButton onClick={onNew} color="inherit" >
             <PlaylistAddIcon />
-          </IconButton>
+          </StyledIconButton>
+          {/* Buttons for wider screens */}
+          <StyledButton
+            variant="outlined"
+            color="inherit"
+            onClick={() => dispatch({ type: "TOGGLE_PANEL" })}
+            endIcon={
+              <Badge invisible={!isFiltered} variant="dot" color="primary" overlap="circle">
+                <FilterListIcon />
+              </Badge>
+            }
+          >
+            Filtres
+          </StyledButton>
+          <StyledButton
+            variant="outlined"
+            color="inherit"
+            onClick={onNew}
+            endIcon={<PlaylistAddIcon />}
+          >
+            Nouvelle Recette
+          </StyledButton>
         </Toolbar>
       </StyledAppBar>
     </>

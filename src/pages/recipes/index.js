@@ -14,10 +14,18 @@ import { GridContainer } from '../../List/index.style'
 import PickingAppBar from '../../List/PickingAppBar'
 import FiltersExpansion from '../../List/FiltersExpansion'
 
+const initialState = {
+  search: "",
+  veg: false,
+  sortByDate: false,
+  expanded: false,
+  hideNew: false,
+}
+
 function reducer(state, { type, payload }) {
   switch (type) {
     case 'SEARCH':
-      return { ...state, search: payload };
+      return { ...state, search: payload, sortByDate: false };
     case 'RESET_SEARCH':
       return { ...state, search: "" };
     case 'TOGGLE_VEG':
@@ -26,6 +34,8 @@ function reducer(state, { type, payload }) {
       return { ...state, sortByDate: !state.sortByDate };
     case 'TOGGLE_PANEL':
       return { ...state, expanded: !state.expanded };
+    case 'TOGGLE_HIDE_NEW':
+      return { ...state, hideNew: !state.hideNew }
     default:
       throw new Error(`Unhandled type: ${type}`);
   }
@@ -46,13 +56,8 @@ const RecipesPage = ({ navigate, location }) => {
     toPath: id => navigate(`${id}${location.search}`, { state: { ...location.state } })
   }
   const { recipes, isError, isLoading } = useEnhancedRecipes();
-  const [state, dispatch] = React.useReducer(reducer, {
-    search: "",
-    veg: false,
-    sortByDate: false,
-    expanded: false,
-  });
-  const { search, veg, sortByDate } = state;
+  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const { search, veg, sortByDate, hideNew } = state;
 
   const fuse = React.useCallback(
     () => {
@@ -73,11 +78,19 @@ const RecipesPage = ({ navigate, location }) => {
       }
       return true;
     })
+    .filter(recipe => {
+      if (hideNew) {
+        return recipe.lastDate !== "";
+      }
+      return true;
+    })
     .sort((a, b) => {
       if (sortByDate) return a.lastDate < b.lastDate ? -1 : 1;
       return null;
     });
-
+  const message = isError ? 'Uner erreur est apparue' :
+    Boolean(listRecipes.length) ? `${listRecipes.length} recettes trouvées` :
+      Boolean(search) ? `Aucune recette pour "${search}"` : null;
   return (
     <>
       {!isPicking ?
@@ -94,18 +107,17 @@ const RecipesPage = ({ navigate, location }) => {
           <FiltersExpansion {...{ dispatch, ...state }} />
         }
         <Container>
-          {isError && "Une erreur est apparue."}
           <GridContainer container spacing={2}>
+            {message &&
+              <Typography color="textSecondary" align="center" style={{ width: '100%', marginTop: "-8px" }}>
+                {message}
+              </Typography>
+            }
             {listRecipes.map(recipe => (
               <Grid item xs={12} key={recipe._id}>
                 <RecipeCard {...{ recipe, pick }} />
               </Grid>
             ))}
-            {(!listRecipes.length && search) &&
-              <Grid item xs={12}>
-                <Typography color="textSecondary">{`Aucune recette pour "${search}"`}</Typography>
-              </Grid>
-            }
           </GridContainer>
         </Container>
       </BoxNextAppBar>
